@@ -13,7 +13,7 @@ public class ConfigSp {
     private SharedPreferences mSharedPreferences = null;
     private static ConfigSp mInstance = null;
 
-    public ConfigSp(SharedPreferences sharedPreferences){
+    private ConfigSp(SharedPreferences sharedPreferences){
         mSharedPreferences = sharedPreferences;
     }
 

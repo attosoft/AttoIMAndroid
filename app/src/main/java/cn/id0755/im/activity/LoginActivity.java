@@ -1,19 +1,13 @@
 package cn.id0755.im.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import net.openmob.mobileimsdk.android.core.LocalUDPDataSender;
+import cn.id0755.sdk.android.core.LocalUDPDataSender;
+import cn.id0755.sdk.android.utils.NetWorkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,22 +64,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "13510773022", "13510773033"
-    };
-
     // UI references.
     private AutoCompleteTextView mPhoneView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
 
     private CheckBox mAutoLogin;
     private CheckBox mRememberPassword;
+    private Button mEmailSignInButton;
 
     /**
      * 登陆进度提示
@@ -94,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * 收到服务端的登陆完成反馈时要通知的观察者（因登陆是异步实现，本观察者将由
      * ChatBaseEvent 事件的处理者在收到服务端的登陆反馈后通知之）
      */
-    private Observer onLoginSucessObserver = null;
+    private Observer onLoginSuccessObserver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,10 +104,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void initView(){
-        mPhoneView = (AutoCompleteTextView) findViewById(R.id.phone);
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPhoneView = findViewById(R.id.phone);
+        mPasswordView = findViewById(R.id.password);
+        mAutoLogin = findViewById(R.id.auto_login);
+        mEmailSignInButton = findViewById(R.id.email_sign_in_button);
+        mRememberPassword = findViewById(R.id.remember_password);
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -133,7 +121,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,7 +128,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mAutoLogin = findViewById(R.id.auto_login);
         mAutoLogin.setChecked(ConfigSp.getConfigSp().getAutoLogin());
         mAutoLogin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -149,7 +135,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 ConfigSp.getConfigSp().setAutoLogin(isChecked);
             }
         });
-        mRememberPassword = findViewById(R.id.remember_password);
+
         mRememberPassword.setChecked(ConfigSp.getConfigSp().getRememberPsw());
         mRememberPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -163,7 +149,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // 实例化登陆进度提示封装类
         onLoginProgress = new OnLoginProgress(this);
         // 准备好异步登陆结果回调观察者（将在登陆方法中使用）
-        onLoginSucessObserver = new Observer() {
+        onLoginSuccessObserver = new Observer() {
             @Override
             public void update(Observable observable, Object data) {
                 // * 已收到服务端登陆反馈则当然应立即取消显示登陆进度条
@@ -199,7 +185,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         onLoginProgress.showProgressing(true);
         // * 设置好服务端反馈的登陆结果观察者（当客户端收到服务端反馈过来的登陆消息时将被通知）
         IMClientManager.getInstance(this).getBaseEventListener()
-                .setLoginOkForLaunchObserver(onLoginSucessObserver);
+                .setLoginOkForLaunchObserver(onLoginSuccessObserver);
 
         // 异步提交登陆id和token
         new LocalUDPDataSender.SendLoginDataAsync(
@@ -229,61 +215,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     /**
-     * 获取APP版本信息.
-     */
-    private String getProgrammVersion() {
-        PackageInfo info;
-        try {
-            info = getPackageManager().getPackageInfo(getPackageName(), 0);
-//			versionCode = info.versionCode;
-//			versionName = info.versionName;
-            return info.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.w(TAG, "读程序版本信息时出错," + e.getMessage(), e);
-            return "N/A";
-        }
-    }
-
-    private boolean CheckNetworkState() {
-        boolean flag = false;
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        if (manager.getActiveNetworkInfo() != null) {
-            flag = manager.getActiveNetworkInfo().isAvailable();
-        }
-        if (!flag) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setIcon(android.R.drawable.ic_dialog_alert);
-            builder.setTitle("Network not avaliable");//
-            builder.setMessage("Current network is not avaliable, set it?");//
-            builder.setPositiveButton("Setting", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS)); //直接进入手机中的wifi网络设置界面
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.create();
-            builder.show();
-        }
-
-        return flag;
-    }
-
-    /**
      * 登陆处理。
      *
      * @see #doLoginImpl()
      */
     private void doLogin() {
-        if (!CheckNetworkState())
+        if (!NetWorkUtils.checkNetworkState(this))
             return;
 
         // 发送登陆数据包
@@ -492,42 +429,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             doLogin();
-        }
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 

@@ -19,8 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.openmob.mobileimsdk.android.ClientCoreSDK;
-import net.openmob.mobileimsdk.android.core.LocalUDPDataSender;
+import cn.id0755.sdk.android.ClientCoreSDK;
+import cn.id0755.sdk.android.core.LocalUDPDataSender;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
