@@ -39,6 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import cn.id0755.im.config.Config;
+import cn.id0755.im.test.SubReqClient;
 import cn.id0755.sdk.android.core.LocalUDPDataSender;
 import cn.id0755.sdk.android.utils.NetWorkUtils;
 
@@ -46,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.Executors;
 
 import cn.id0755.im.R;
 import cn.id0755.im.manager.IMClientManager;
@@ -124,7 +127,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+//                attemptLogin();
+                Executors.newSingleThreadExecutor().submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new SubReqClient().connect(Config.PORT, Config.HOST);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 

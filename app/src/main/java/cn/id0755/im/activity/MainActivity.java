@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cn.id0755.im.config.Config;
+import cn.id0755.im.test.SubReqClient;
 import cn.id0755.sdk.android.ClientCoreSDK;
 import cn.id0755.sdk.android.core.LocalUDPDataSender;
 
@@ -60,7 +62,11 @@ public class MainActivity extends AppCompatActivity {
                     Executors.newSingleThreadExecutor().submit(new Runnable() {
                         @Override
                         public void run() {
-                            new TimeClient().connect(8081, "172.20.205.60");
+                            try {
+                                new SubReqClient().connect(Config.PORT, Config.HOST);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                     return true;

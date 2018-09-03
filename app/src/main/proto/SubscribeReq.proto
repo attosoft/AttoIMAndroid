@@ -1,10 +1,11 @@
 package netty;
-option java_package = "cn.id0755.nettystudy.ch8";
+option java_package = "cn.id0755.im.proto";
 option java_outer_classname = "SubscribeReqProto";
 
 message SubscribeReq {
-    required int32 subReqID = 1;
-    required string userName = 2;
-    required string productName = 3;
-    repeated string address = 4;
+    required int32 protoType = 1 [default = 1];
+    required int32 subReqID = 2;
+    required string userName = 3;
+    required string productName = 4;
+    repeated string address = 5;
 }

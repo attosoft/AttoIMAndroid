@@ -1,5 +1,5 @@
 package netty;
-option java_package = "cn.id0755.nettystudy.ch8";
+option java_package = "cn.id0755.im.proto";
 option java_outer_classname = "SubscribeRespProto";
 
 message SubscribeResp {

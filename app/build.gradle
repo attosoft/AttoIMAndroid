@@ -4,7 +4,7 @@ apply plugin: 'com.google.protobuf'
 android {
     compileSdkVersion Integer.parseInt(rootProject.ANDROID_BUILD_SDK_VERSION)
     defaultConfig {
-        applicationId "cn.id0755.attoim"
+        applicationId 'cn.id0755.im'
         minSdkVersion Integer.parseInt(rootProject.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(rootProject.ANDROID_BUILD_TARGET_SDK_VERSION)
         versionCode 1
@@ -16,6 +16,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    productFlavors {
     }
 }
 
@@ -64,6 +66,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation "io.netty:netty-all:${NETTY_VERSION}"
-
     implementation "com.google.protobuf:protobuf-lite:${GOOGLE_PROTOBUF_LITE}"
 }

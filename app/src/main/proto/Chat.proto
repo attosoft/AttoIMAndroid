@@ -1,0 +1,25 @@
+package cn.id0755.im.chat.proto;
+//option java_package = "cn.id0755.im.proto";
+//option java_outer_classname = "SubscribeReqProto";
+
+message SendMessageRequest {
+    required int32 protoType = 1 [default = 2];
+    required string access_token = 2;
+    required string from = 3;
+    required string to = 4;
+    required string text = 5;
+    required string topic = 6;
+}
+
+message SendMessageResponse {
+    enum Error {
+        ERR_OK = 0;
+        ERR_SYS = -1;
+    }
+
+    required int32 err_code = 1;
+    required string err_msg = 2;
+    required string from = 3;
+    required string text = 4;
+    required string topic = 5;
+}
