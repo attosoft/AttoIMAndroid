@@ -1,8 +1,9 @@
+syntax = "proto3";
 package cn.id0755.im.chat.proto;
 
 
 message MessagePush {
-    required string topic = 1;
-    required string content = 2;
-    required string from = 3;
+     string topic = 1;
+     string content = 2;
+     string from = 3;
 }

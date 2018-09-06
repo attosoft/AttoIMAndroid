@@ -40,7 +40,7 @@ import android.widget.Toast;
 
 
 import cn.id0755.im.config.Config;
-import cn.id0755.im.test.SubReqClient;
+import cn.id0755.im.manager.ConnectionManager;
 import cn.id0755.sdk.android.core.LocalUDPDataSender;
 import cn.id0755.sdk.android.utils.NetWorkUtils;
 
@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         initForLogin();
     }
 
-    private void initView(){
+    private void initView() {
         mPhoneView = findViewById(R.id.phone);
         mPasswordView = findViewById(R.id.password);
         mAutoLogin = findViewById(R.id.auto_login);
@@ -131,11 +131,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            new SubReqClient().connect(Config.PORT, Config.HOST);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        ConnectionManager.getInstance().connect();
                     }
                 });
             }

@@ -1,6 +1,6 @@
 package cn.id0755.im;
 
-import cn.id0755.nettystudy.ch8.SubscribeRespProto;
+import cn.id0755.im.proto.SubscribeRespProto;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

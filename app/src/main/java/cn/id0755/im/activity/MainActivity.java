@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.id0755.im.config.Config;
-import cn.id0755.im.test.SubReqClient;
+import cn.id0755.im.manager.ConnectionManager;
 import cn.id0755.sdk.android.ClientCoreSDK;
 import cn.id0755.sdk.android.core.LocalUDPDataSender;
 
@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import cn.id0755.im.R;
-import cn.id0755.im.TimeClient;
 import cn.id0755.im.manager.IMClientManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                new SubReqClient().connect(Config.PORT, Config.HOST);
+                                new ConnectionManager().connect(Config.PORT, Config.HOST);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

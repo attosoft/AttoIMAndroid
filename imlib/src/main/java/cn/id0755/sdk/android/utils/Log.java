@@ -21,7 +21,7 @@ public class Log {
     public static final int LEVEL_NONE = 6;
 
     // defaults to LEVEL_NONE
-    private static int level = LEVEL_NONE;
+    private static int level = LEVEL_VERBOSE;
     public static Context toastSupportContext = null;
 
     public interface LogImp {

@@ -1,8 +1,9 @@
+syntax = "proto3";
 package cn.id0755.im.chat.proto;
 
 
 message TopicRequest {
-    required string topic = 1;
+     string topic = 1;
 }
 
 
@@ -13,6 +14,6 @@ message TopicResponse {
         ERR_SYS = -1;
     }
 
-    required int32 err_code = 1;
-    required string err_msg = 2;
+     int32 err_code = 1;
+     string err_msg = 2;
 }

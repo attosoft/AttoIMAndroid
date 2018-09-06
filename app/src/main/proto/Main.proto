@@ -1,33 +1,23 @@
+syntax = "proto3";
 package cn.id0755.im.chat.proto;
 
-enum CmdID{
-    CMD_ID_INVALID = -1;
-    CMD_ID_UNKNOWN = 0;
-    CMD_ID_HELLO = 1;
-    CMD_ID_AUTH = 2;
-    CMD_ID_SEND_MESSAGE = 3;
-    CMD_ID_CONVERSATION_LIST = 4;
-    CMD_ID_JOINTOPIC = 5;
-    CMD_ID_LEFTTOPIC = 7;
-}
-
 message HelloRequest {
-    required string user = 1;
-    required string text = 2;
-    optional bytes dump_content = 3;
+     string user = 1;
+     string text = 2;
+     bytes dump_content = 3;
 }
 
 
 message HelloResponse {
-    required int32 retcode = 1;
-    optional string errmsg = 2;
-    optional bytes dump_content = 3;
+     int32 retcode = 1;
+     string errmsg = 2;
+     bytes dump_content = 3;
 }
 
 message Conversation {
-    required string topic = 1;
-    required string notice = 2;
-    required string name = 3;
+     string topic = 1;
+     string notice = 2;
+     string name = 3;
 }
 
 message ConversationListRequest {
@@ -39,8 +29,8 @@ message ConversationListRequest {
         HOT = 4;
     }
 
-    required string access_token = 1;
-    required int32 type = 2;
+     string access_token = 1;
+     int32 type = 2;
 }
 
 message ConversationListResponse {
