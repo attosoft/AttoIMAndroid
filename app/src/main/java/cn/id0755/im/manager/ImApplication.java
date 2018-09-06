@@ -1,7 +1,7 @@
 package cn.id0755.im.manager;
 
 import android.app.Application;
-
+@Deprecated
 public class ImApplication extends Application{
     @Override
     public void onCreate() {

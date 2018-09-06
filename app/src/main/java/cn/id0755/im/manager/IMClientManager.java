@@ -23,7 +23,7 @@ import cn.id0755.sdk.android.conf.ConfigEntity;
 import cn.id0755.im.event.ChatBaseEventImpl;
 import cn.id0755.im.event.ChatTransDataEventImpl;
 import cn.id0755.im.event.MessageQoSEventImpl;
-
+@Deprecated
 public class IMClientManager {
     private static String TAG = IMClientManager.class.getSimpleName();
 
