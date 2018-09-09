@@ -37,6 +37,8 @@
             android:theme="@style/AppTheme"
             android:name="cn.id0755.im.activity.MainActivity"
             android:label="@string/title_activity_login"/>
+        <service android:name=".service.MsgRemoteService"
+            android:process=":messageService"/>
     </application>
 
 </manifest>

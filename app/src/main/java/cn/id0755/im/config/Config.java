@@ -1,8 +1,8 @@
 package cn.id0755.im.config;
 
 public class Config {
-    //    public final static String HOST = "192.168.31.29";
-    public final static String HOST = "172.20.205.62";
+        public final static String HOST = "192.168.2.3";
+//    public final static String HOST = "172.20.205.62";
     /**
      * 监听端口
      */

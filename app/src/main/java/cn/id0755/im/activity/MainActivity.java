@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +21,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cn.id0755.im.ITaskWrapper;
+import cn.id0755.im.chat.proto.Login;
+import cn.id0755.im.chat.proto.Message;
 import cn.id0755.im.config.Config;
 import cn.id0755.im.manager.ConnectionManager;
+import cn.id0755.im.manager.MessageServiceManager;
+import cn.id0755.im.utils.MessageUtil;
 import cn.id0755.sdk.android.ClientCoreSDK;
 import cn.id0755.sdk.android.core.LocalUDPDataSender;
 
@@ -62,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                new ConnectionManager().connect(Config.PORT, Config.HOST);
+//                                new ConnectionManager().connect(Config.PORT, Config.HOST);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

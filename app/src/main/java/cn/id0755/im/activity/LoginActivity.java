@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -39,8 +41,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import cn.id0755.im.ITaskWrapper;
+import cn.id0755.im.chat.proto.Login;
+import cn.id0755.im.chat.proto.Message;
 import cn.id0755.im.config.Config;
 import cn.id0755.im.manager.ConnectionManager;
+import cn.id0755.im.manager.MessageServiceManager;
+import cn.id0755.im.task.LoginTask;
+import cn.id0755.im.utils.MessageUtil;
 import cn.id0755.sdk.android.core.LocalUDPDataSender;
 import cn.id0755.sdk.android.utils.NetWorkUtils;
 
@@ -131,7 +139,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     @Override
                     public void run() {
-                        ConnectionManager.getInstance().connect();
+//                        ConnectionManager.getInstance().connect();
+                        MessageServiceManager.getInstance().send(new LoginTask());
                     }
                 });
             }

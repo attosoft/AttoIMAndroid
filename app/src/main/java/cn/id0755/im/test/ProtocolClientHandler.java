@@ -1,35 +1,65 @@
 package cn.id0755.im.test;
 
+import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
+import cn.id0755.im.manager.iinterface.IChannelListener;
 import cn.id0755.im.utils.MessageUtil;
 import cn.id0755.sdk.android.utils.Log;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 
 
 public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.MessageData> {
     private final static String TAG = "ProtocolClientHandler";
 
+    private IChannelListener mChannelListener;
     /**
      * Creates a client-side handler.
      */
-    public ProtocolClientHandler() {
+    public ProtocolClientHandler(IChannelListener channelListener) {
+        mChannelListener = channelListener;
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        if (mChannelListener != null){
+            mChannelListener.channelInactive(ctx);
+        }
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            switch (e.state()) {
+                case READER_IDLE:
+//                    handleReaderIdle(ctx);
+                    HeartBeat.Ping ping = HeartBeat.Ping
+                            .newBuilder()
+                            .setCmdId(Message.CMD_ID.CMD_PING)
+                            .build();
+                    ctx.channel().writeAndFlush(MessageUtil.wrap(ping));
+                    break;
+                case WRITER_IDLE:
+//                    handleWriterIdle(ctx);
+                    break;
+                case ALL_IDLE:
+//                    handleAllIdle(ctx);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        for (int i = 0; i < 10; i++) {
-            ctx.write(MessageUtil.wrap(sendMessageReq(i)));
+        if (mChannelListener != null){
+            mChannelListener.channelActive(ctx);
         }
-        ctx.flush();
-    }
-
-    private Login.LoginRequest sendMessageReq(int i) {
-        Login.LoginRequest.Builder builder = Login.LoginRequest.newBuilder();
-        builder.setAccount("13510773022");
-        builder.setPassword("2219252");
-        return builder.build();
     }
 
     @Override
@@ -49,6 +79,12 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
                 Log.e(TAG, loginResponse.toString());
             }
             break;
+            case CMD_PING:
+                break;
+            case CMD_PONG:
+                break;
+            default:
+                break;
         }
     }
 
@@ -59,6 +95,9 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (mChannelListener != null){
+            mChannelListener.exceptionCaught(ctx, cause);
+        }
         cause.printStackTrace();
         ctx.close();
     }

@@ -1,0 +1,13 @@
+syntax = "proto3";
+import "Message.proto";
+package cn.id0755.im.chat.proto;
+
+message Ping {
+    CMD_ID cmd_id = 1;
+    string extral = 2;
+}
+
+message Pong {
+    CMD_ID cmd_id = 1;
+    string extral = 2;
+}

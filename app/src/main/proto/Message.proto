@@ -10,8 +10,11 @@ enum CMD_ID {
     CMD_CONVERSATION_LIST = 4;
     CMD_JOINTOPIC = 5;
     CMD_LEFTTOPIC = 7;
+
     CMD_LOGIN_REQ = 8;
     CMD_LOGIN_RESP = 9;
+    CMD_PING=10;
+    CMD_PONG=11;
 }
 
 message MessageData {

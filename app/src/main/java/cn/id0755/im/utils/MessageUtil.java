@@ -3,6 +3,7 @@ package cn.id0755.im.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
 
@@ -10,6 +11,8 @@ public class MessageUtil {
     private static final Map<Class, Message.CMD_ID> mCmdIdMap = new HashMap<>();
 
     static {
+        mCmdIdMap.put(HeartBeat.Ping.class, Message.CMD_ID.CMD_PING);
+        mCmdIdMap.put(HeartBeat.Pong.class, Message.CMD_ID.CMD_PONG);
         mCmdIdMap.put(Login.LoginRequest.class, Message.CMD_ID.CMD_LOGIN_REQ);
         mCmdIdMap.put(Login.LoginResponse.class, Message.CMD_ID.CMD_LOGIN_RESP);
     }
