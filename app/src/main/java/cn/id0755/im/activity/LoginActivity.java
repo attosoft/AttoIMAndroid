@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 //        if (!TextUtils.isEmpty(phoneNumber)){
 //            mPhoneView.setText(phoneNumber);
 //        }
-        mPhoneView.setText("13510773022");
+        mPhoneView.setText("13510773000");
         mPasswordView.setText("123456");
 
 
