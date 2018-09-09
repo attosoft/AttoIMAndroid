@@ -14,14 +14,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cn.id0755.im.ITaskWrapper;
-import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.im.config.Config;
 import cn.id0755.im.config.TaskProperty;
 import cn.id0755.im.manager.iinterface.IChannelListener;
 import cn.id0755.im.manager.iinterface.IServerConnectionListener;
-import cn.id0755.im.test.ProtocolClientHandler;
-import cn.id0755.im.utils.MessageUtil;
+import cn.id0755.im.handler.ProtocolClientHandler;
 import cn.id0755.sdk.android.utils.Log;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -121,7 +119,7 @@ public class ConnectionManager {
                                     try {
                                         Message.MessageData messageData = Message.MessageData.getDefaultInstance()
                                                 .getParserForType()
-                                                .parseFrom(data,0,data.length);
+                                                .parseFrom(data, 0, data.length);
                                         mChannel.writeAndFlush(messageData);
                                     } catch (InvalidProtocolBufferException e) {
                                         e.printStackTrace();
@@ -204,8 +202,8 @@ public class ConnectionManager {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            /** 添加读写超时，产生idle事件，实现心跳机制*/
-                            ch.pipeline().addLast(new IdleStateHandler(10,10,20));
+                            /** 添加读写超时，产生idle事件，实现心跳机制;可以更智能一点，不固定收到就发ping，10s -- 10分钟之间*/
+                            ch.pipeline().addLast(new IdleStateHandler(10, 10, 20));
                             ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
                             ch.pipeline().addLast(new ProtobufDecoder(Message.MessageData.getDefaultInstance()));
                             ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
@@ -224,6 +222,8 @@ public class ConnectionManager {
                         if (mServerConnectionListener != null) {
                             mServerConnectionListener.onConnectStateChange(ConnectState.DISCONNECT);
                         }
+                    } else {
+                        //todo
                     }
                 }
             }).sync();
@@ -265,7 +265,7 @@ public class ConnectionManager {
         @Override
         public void operationComplete(ChannelFuture future) throws Exception {
             if (future.isSuccess()) {
-                Log.d(TAG,"ConnectionListener " + "success");
+                Log.d(TAG, "ConnectionListener " + "success");
                 synchronized (mChannelLock) {
                     mChannel = future.channel();
                 }
@@ -274,7 +274,7 @@ public class ConnectionManager {
                     mServerConnectionListener.onConnectStateChange(ConnectState.CONNECTED);
                 }
             } else {
-                Log.d(TAG,"ConnectionListener " + "false");
+                Log.d(TAG, "ConnectionListener " + "false");
                 future.cause().printStackTrace();
                 if (mServerConnectionListener != null) {
                     mServerConnectionListener.onConnectStateChange(ConnectState.DISCONNECT);
@@ -297,6 +297,7 @@ public class ConnectionManager {
     }
 
     public boolean cancel(int taskId) {
+        Log.d(TAG, "cancel | taskId:"+taskId);
         ITaskWrapper taskWrapper = mSendMsgMap.get(taskId);
         boolean success = mTaskQueue.remove(taskWrapper);
         if (success) {

@@ -15,6 +15,9 @@ import cn.id0755.im.manager.iinterface.IServerConnectionListener;
 import cn.id0755.im.utils.RandomUtil;
 import cn.id0755.sdk.android.utils.Log;
 
+/**
+ * 运行于 :messageService进程中 自动处理与服务器的长连接
+ */
 public class MsgRemoteServiceStub extends IMessageService.Stub {
     private final static String TAG = MsgRemoteServiceStub.class.getSimpleName();
     public static final String DEVICE_NAME = android.os.Build.MANUFACTURER + "-" + android.os.Build.MODEL;
@@ -27,11 +30,12 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
     private IServerConnectionListener mConnectionListener = new IServerConnectionListener() {
         @Override
         public void onConnectState(ConnectState type) {
-
+            Log.d(TAG, "IServerConnectionListener | onConnectState | type:" + type);
         }
 
         @Override
         public void onConnectStateChange(ConnectState type) {
+            Log.d(TAG, "IServerConnectionListener | onConnectStateChange | type:" + type);
             switch (type) {
                 case CONNECTED:
                     break;
@@ -41,7 +45,7 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d(TAG,"IServerConnectionListener " + " DISCONNECT " + "开始重连");
+                            Log.d(TAG, "IServerConnectionListener " + " DISCONNECT " + "开始重连");
                             ConnectionManager.getInstance().autoConnect(mConnectionListener);
                         }
                     }, RandomUtil.randInt(1, 5));

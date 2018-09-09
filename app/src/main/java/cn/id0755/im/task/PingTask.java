@@ -24,9 +24,9 @@ public class PingTask extends ITaskWrapper.Stub implements ITaskWrapper {
     public byte[] req2buf() throws RemoteException {
         HeartBeat.Ping ping = HeartBeat.Ping
                 .newBuilder()
-                .setCmdId(Message.CMD_ID.CMD_PING)
+                .setCmdId(Message.CMD_ID.PING)
                 .build();
-        return MessageUtil.wrap(ping).toByteArray();
+        return MessageUtil.wrap(Message.CMD_ID.PING,ping).toByteArray();
     }
 
     @Override

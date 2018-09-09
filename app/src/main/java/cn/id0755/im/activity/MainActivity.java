@@ -2,10 +2,7 @@ package cn.id0755.im.activity;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -19,17 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import cn.id0755.im.ITaskWrapper;
-import cn.id0755.im.chat.proto.Login;
-import cn.id0755.im.chat.proto.Message;
-import cn.id0755.im.config.Config;
-import cn.id0755.im.manager.ConnectionManager;
-import cn.id0755.im.manager.MessageServiceManager;
-import cn.id0755.im.utils.MessageUtil;
-import cn.id0755.sdk.android.ClientCoreSDK;
-import cn.id0755.sdk.android.core.LocalUDPDataSender;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +26,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import cn.id0755.im.R;
-import cn.id0755.im.manager.IMClientManager;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -107,10 +92,8 @@ public class MainActivity extends AppCompatActivity {
         chatInfoListAdapter = new MyAdapter(this);
         chatInfoListView.setAdapter(chatInfoListAdapter);
 
-        this.setTitle("当前登陆："
-                + ClientCoreSDK.getInstance().getInstance().getCurrentLoginUserId() + "");
+        this.setTitle("当前登陆：" + "");
         initListeners();
-        initOthers();
     }
 
     private void initListeners() {
@@ -132,38 +115,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void initOthers() {
-        // Refresh userId to show
-        refreshMyid();
-
-        // Set MainGUI instance refrence to listeners
-        IMClientManager.getInstance(this).getTransDataListener().setMainGUI(this);
-        IMClientManager.getInstance(this).getBaseEventListener().setMainGUI(this);
-        IMClientManager.getInstance(this).getMessageQoSListener().setMainGUI(this);
-    }
-
-    public void refreshMyid() {
-        boolean connectedToServer = ClientCoreSDK.getInstance().isConnectedToServer();
-        this.viewMyid.setText(connectedToServer ? "通信正常" : "连接断开");
-    }
-
     private void doSendMessage() {
         String msg = editContent.getText().toString().trim();
         String friendId = editId.getText().toString().trim();
         if (msg.length() > 0 && friendId.length() > 0) {
             showIMInfo_black("我对" + friendId + "说：" + msg);
-
-            // 发送消息（Android系统要求必须要在独立的线程中发送哦）
-            new LocalUDPDataSender.SendCommonDataAsync(MainActivity.this, msg, friendId)//, true)
-            {
-                @Override
-                protected void onPostExecute(Integer code) {
-                    if (code == 0)
-                        Log.d(MainActivity.class.getSimpleName(), "2数据已成功发出！");
-                    else
-                        Toast.makeText(getApplicationContext(), "数据发送失败。错误码是：" + code + "！", Toast.LENGTH_SHORT).show();
-                }
-            }.execute();
         } else {
             showIMInfo_red("接收者id或发送内容为空，发送没有继续!");
             Log.e(MainActivity.class.getSimpleName(), "msg.len=" + msg.length() + ",friendId.len=" + friendId.length());
@@ -172,33 +128,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void doLogout() {
         // 发出退出登陆请求包（Android系统要求必须要在独立的线程中发送哦）
-        new AsyncTask<Object, Integer, Integer>() {
-            @Override
-            protected Integer doInBackground(Object... params) {
-                int code = -1;
-                try {
-                    code = LocalUDPDataSender.getInstance(MainActivity.this).sendLoginout();
-                } catch (Exception e) {
-                    Log.w(TAG, e);
-                }
-
-                //## BUG FIX: 20170713 START by JackJiang
-                // 退出登陆时记得一定要调用此行，不然不退出APP的情况下再登陆时会报 code=203错误哦！
-                IMClientManager.getInstance(MainActivity.this).resetInitFlag();
-                //## BUG FIX: 20170713 END by JackJiang
-
-                return code;
-            }
-
-            @Override
-            protected void onPostExecute(Integer code) {
-                refreshMyid();
-                if (code == 0)
-                    Log.d(MainActivity.class.getSimpleName(), "注销登陆请求已完成！");
-                else
-                    Toast.makeText(getApplicationContext(), "注销登陆请求发送失败。错误码是：" + code + "！", Toast.LENGTH_SHORT).show();
-            }
-        }.execute();
     }
 
     private void doExit() {

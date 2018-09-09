@@ -1,4 +1,4 @@
-package cn.id0755.im.test;
+package cn.id0755.im.handler;
 
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Login;
@@ -15,6 +15,7 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     private final static String TAG = "ProtocolClientHandler";
 
     private IChannelListener mChannelListener;
+
     /**
      * Creates a client-side handler.
      */
@@ -24,7 +25,7 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        if (mChannelListener != null){
+        if (mChannelListener != null) {
             mChannelListener.channelInactive(ctx);
         }
         super.channelInactive(ctx);
@@ -32,6 +33,7 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        Log.d(TAG, "userEventTriggered | evt:" + evt.toString());
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent e = (IdleStateEvent) evt;
             switch (e.state()) {
@@ -39,9 +41,9 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 //                    handleReaderIdle(ctx);
                     HeartBeat.Ping ping = HeartBeat.Ping
                             .newBuilder()
-                            .setCmdId(Message.CMD_ID.CMD_PING)
+                            .setCmdId(Message.CMD_ID.PING)
                             .build();
-                    ctx.channel().writeAndFlush(MessageUtil.wrap(ping));
+                    ctx.channel().writeAndFlush(MessageUtil.wrap(Message.CMD_ID.PING, ping));
                     break;
                 case WRITER_IDLE:
 //                    handleWriterIdle(ctx);
@@ -57,31 +59,30 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        if (mChannelListener != null){
+        if (mChannelListener != null) {
             mChannelListener.channelActive(ctx);
         }
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message.MessageData msg) throws Exception {
+        Log.d(TAG, "channelRead0 | msg:" + msg.getCmdId());
         switch (msg.getCmdId()) {
-            case CMD_LOGIN_REQ: {
+            case LOGIN_REQ: {
                 Login.LoginRequest loginRequest = Login.LoginRequest.getDefaultInstance()
                         .getParserForType()
                         .parseFrom(msg.getContent());
-                Log.e(TAG, loginRequest.toString());
             }
             break;
-            case CMD_LOGIN_RESP: {
+            case LOGIN_RESP: {
                 Login.LoginResponse loginResponse = Login.LoginResponse.getDefaultInstance()
                         .getParserForType()
                         .parseFrom(msg.getContent());
-                Log.e(TAG, loginResponse.toString());
             }
             break;
-            case CMD_PING:
+            case PING:
                 break;
-            case CMD_PONG:
+            case PONG:
                 break;
             default:
                 break;
@@ -95,9 +96,10 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        if (mChannelListener != null){
+        if (mChannelListener != null) {
             mChannelListener.exceptionCaught(ctx, cause);
         }
+        Log.d(TAG,"exceptionCaught | cause:"+cause.getMessage());
         cause.printStackTrace();
         ctx.close();
     }

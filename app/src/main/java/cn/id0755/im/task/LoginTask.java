@@ -25,9 +25,9 @@ public class LoginTask extends ITaskWrapper.Stub implements ITaskWrapper {
         Login.LoginRequest loginRequest = Login.LoginRequest.newBuilder()
                 .setAccount("atto")
                 .setPassword("123456")
-                .setCmdId(Message.CMD_ID.CMD_LOGIN_REQ)
+                .setCmdId(Message.CMD_ID.LOGIN_REQ)
                 .build();
-        return MessageUtil.wrap(loginRequest).toByteArray();
+        return MessageUtil.wrap(Message.CMD_ID.LOGIN_REQ,loginRequest).toByteArray();
     }
 
     @Override

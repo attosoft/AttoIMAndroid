@@ -41,15 +41,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import cn.id0755.im.ITaskWrapper;
-import cn.id0755.im.chat.proto.Login;
-import cn.id0755.im.chat.proto.Message;
-import cn.id0755.im.config.Config;
-import cn.id0755.im.manager.ConnectionManager;
 import cn.id0755.im.manager.MessageServiceManager;
 import cn.id0755.im.task.LoginTask;
-import cn.id0755.im.utils.MessageUtil;
-import cn.id0755.sdk.android.core.LocalUDPDataSender;
 import cn.id0755.sdk.android.utils.NetWorkUtils;
 
 import java.util.ArrayList;
@@ -59,7 +52,6 @@ import java.util.Observer;
 import java.util.concurrent.Executors;
 
 import cn.id0755.im.R;
-import cn.id0755.im.manager.IMClientManager;
 import cn.id0755.im.store.ConfigSp;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -201,35 +193,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void doLoginImpl() {
         // * 立即显示登陆处理进度提示（并将同时启动超时检查线程）
         onLoginProgress.showProgressing(true);
-        // * 设置好服务端反馈的登陆结果观察者（当客户端收到服务端反馈过来的登陆消息时将被通知）
-        IMClientManager.getInstance(this).getBaseEventListener()
-                .setLoginOkForLaunchObserver(onLoginSuccessObserver);
-
-        // 异步提交登陆id和token
-        new LocalUDPDataSender.SendLoginDataAsync(
-                LoginActivity.this
-                , mPhoneView.getText().toString().trim()
-                , mPasswordView.getText().toString().trim()) {
-            /**
-             * 登陆信息发送完成后将调用本方法（注意：此处仅是登陆信息发送完成
-             * ，真正的登陆结果要在异步回调中处理哦）。
-             *
-             * @param code 数据发送返回码，0 表示数据成功发出，否则是错误码
-             */
-            @Override
-            protected void fireAfterSendLogin(int code) {
-                if (code == 0) {
-                    //
-                    Toast.makeText(getApplicationContext(), "数据发送成功！", Toast.LENGTH_SHORT).show();
-                    Log.d(MainActivity.class.getSimpleName(), "登陆/连接信息已成功发出！");
-                } else {
-                    Toast.makeText(getApplicationContext(), "数据发送失败。错误码是：" + code + "！", Toast.LENGTH_SHORT).show();
-
-                    // * 登陆信息没有成功发出时当然无条件取消显示登陆进度条
-                    onLoginProgress.showProgressing(false);
-                }
-            }
-        }.execute();
     }
 
     /**
