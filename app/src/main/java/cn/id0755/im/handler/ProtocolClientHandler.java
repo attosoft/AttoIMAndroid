@@ -1,5 +1,12 @@
 package cn.id0755.im.handler;
 
+import com.google.protobuf.MessageLite;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
@@ -16,11 +23,18 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     private IChannelListener mChannelListener;
 
+    private List<BaseBizHandler> mBizHandlerList = new LinkedList<>();
+
     /**
      * Creates a client-side handler.
      */
     public ProtocolClientHandler(IChannelListener channelListener) {
         mChannelListener = channelListener;
+        init();
+    }
+
+    private void init() {
+        mBizHandlerList.add(new LoginHandler());
     }
 
     @Override
@@ -38,7 +52,6 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
             IdleStateEvent e = (IdleStateEvent) evt;
             switch (e.state()) {
                 case READER_IDLE:
-//                    handleReaderIdle(ctx);
                     HeartBeat.Ping ping = HeartBeat.Ping
                             .newBuilder()
                             .setCmdId(Message.CMD_ID.PING)
@@ -46,10 +59,8 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
                     ctx.channel().writeAndFlush(MessageUtil.wrap(Message.CMD_ID.PING, ping));
                     break;
                 case WRITER_IDLE:
-//                    handleWriterIdle(ctx);
                     break;
                 case ALL_IDLE:
-//                    handleAllIdle(ctx);
                     break;
                 default:
                     break;
@@ -67,25 +78,11 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message.MessageData msg) throws Exception {
         Log.d(TAG, "channelRead0 | msg:" + msg.getCmdId());
-        switch (msg.getCmdId()) {
-            case LOGIN_REQ: {
-                Login.LoginRequest loginRequest = Login.LoginRequest.getDefaultInstance()
-                        .getParserForType()
-                        .parseFrom(msg.getContent());
+
+        for (BaseBizHandler bizHandler : mBizHandlerList) {
+            if (bizHandler.channelRead0(ctx, msg)) {
+                break;
             }
-            break;
-            case LOGIN_RESP: {
-                Login.LoginResponse loginResponse = Login.LoginResponse.getDefaultInstance()
-                        .getParserForType()
-                        .parseFrom(msg.getContent());
-            }
-            break;
-            case PING:
-                break;
-            case PONG:
-                break;
-            default:
-                break;
         }
     }
 
@@ -99,7 +96,7 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
         if (mChannelListener != null) {
             mChannelListener.exceptionCaught(ctx, cause);
         }
-        Log.d(TAG,"exceptionCaught | cause:"+cause.getMessage());
+        Log.d(TAG, "exceptionCaught | cause:" + cause.getMessage());
         cause.printStackTrace();
         ctx.close();
     }
