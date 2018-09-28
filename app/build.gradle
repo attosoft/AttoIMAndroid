@@ -19,6 +19,10 @@ android {
     }
     productFlavors {
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 //添加此段
@@ -67,4 +71,55 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation "io.netty:netty-all:${NETTY_VERSION}"
     implementation "com.google.protobuf:protobuf-lite:${GOOGLE_PROTOBUF_LITE}"
+    def lifecycle_version = "1.1.1"
+
+    // ViewModel and LiveData
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+
+    //     Support library depends on this lightweight import
+    implementation "android.arch.lifecycle:runtime:$lifecycle_version"
+//    annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version"
+    // use kapt for Kotlin
+    // alternately - if using Java8, use the following instead of compiler
+    implementation "android.arch.lifecycle:common-java8:$lifecycle_version"
+
+    // optional - ReactiveStreams support for LiveData
+    implementation "android.arch.lifecycle:reactivestreams:$lifecycle_version"
+
+    // optional - Test helpers for LiveData
+    testImplementation "android.arch.core:core-testing:$lifecycle_version"
+    def room_version = "1.1.1"
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+
+    // use kapt for Kotlin
+
+    // optional - RxJava support for Room
+    implementation "android.arch.persistence.room:rxjava2:$room_version"
+
+    // optional - Guava support for Room, including Optional and ListenableFuture
+    implementation "android.arch.persistence.room:guava:$room_version"
+
+    // Test helpers
+    testImplementation "android.arch.persistence.room:testing:$room_version"
+    def paging_version = "1.0.0"
+    implementation "android.arch.paging:runtime:$paging_version"
+
+    // alternatively - without Android dependencies for testing
+    testImplementation "android.arch.paging:common:$paging_version"
+
+    // optional - RxJava support, currently in release candidate
+    implementation 'android.arch.paging:rxjava2:1.0.0-rc1'
+    def nav_version = "1.0.0-alpha06"
+    implementation "android.arch.navigation:navigation-fragment:$nav_version"
+
+    // use -ktx for Kotlin
+    implementation "android.arch.navigation:navigation-ui:$nav_version"
+
+    // use -ktx for Kotlin
+
+    // optional - Test helpers
+    androidTestImplementation "android.arch.navigation:navigation-testing:$nav_version"
+
+    // use -ktx for Kotlin
 }

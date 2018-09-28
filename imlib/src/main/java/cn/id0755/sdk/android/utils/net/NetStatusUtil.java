@@ -88,7 +88,6 @@ public class NetStatusUtil {
 
         if (activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI) {
             return "WIFI";
-
         } else {
             if (activeNetInfo.getExtraInfo() != null) {
                 return activeNetInfo.getExtraInfo();
@@ -96,7 +95,6 @@ public class NetStatusUtil {
             return "MOBILE";
         }
     }
-
 
     public static int getNetWorkType(Context context) {
 
