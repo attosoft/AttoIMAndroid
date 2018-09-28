@@ -7,7 +7,7 @@ android {
         minSdkVersion Integer.parseInt(rootProject.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(rootProject.ANDROID_BUILD_TARGET_SDK_VERSION)
         versionCode 1
-        versionName "3.2"
+        versionName "1.0"
     }
     buildTypes {
         release {
@@ -31,22 +31,22 @@ dependencies {
 }
 
 // 打出“MobileIMSDK4a.jar”，以便放到其它工程里使用
-task makeJar(type: Jar) {
-
-    // 删除之前已打过的jar
-    delete 'build/dist/MobileIMSDK4a.jar'
-
-    // 要打包的类目录
-    from file('build/intermediates/classes/release')
-    // 打包完成的jar包名
-    archiveName = 'MobileIMSDK4a.jar'
-    // 打包完成后的jar包位置
-    destinationDir = file('build/dist')
-
-    // 过滤不需要的系统生成class
-    exclude "**/**/BuildConfig.class"
-    exclude "**/**/BuildConfig\$*.class"
-    exclude "**/R.class"
-    exclude "**/R\$*.class"
-}
-makeJar.dependsOn(build)
+//task makeJar(type: Jar) {
+//
+//    // 删除之前已打过的jar
+//    delete 'build/dist/MobileIMSDK4a.jar'
+//
+//    // 要打包的类目录
+//    from file('build/intermediates/classes/release')
+//    // 打包完成的jar包名
+//    archiveName = 'MobileIMSDK4a.jar'
+//    // 打包完成后的jar包位置
+//    destinationDir = file('build/dist')
+//
+//    // 过滤不需要的系统生成class
+//    exclude "**/**/BuildConfig.class"
+//    exclude "**/**/BuildConfig\$*.class"
+//    exclude "**/R.class"
+//    exclude "**/R\$*.class"
+//}
+//makeJar.dependsOn(build)
