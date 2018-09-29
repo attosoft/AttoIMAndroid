@@ -1,4 +1,4 @@
-package cn.id0755.im.manager;
+package cn.id0755.sdk.android.manager;
 
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -15,11 +15,11 @@ import java.util.concurrent.TimeUnit;
 
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Message;
-import cn.id0755.im.config.Config;
-import cn.id0755.im.config.TaskProperty;
-import cn.id0755.im.manager.iinterface.IChannelListener;
-import cn.id0755.im.manager.iinterface.IServerConnectionListener;
-import cn.id0755.im.handler.ProtocolClientHandler;
+import cn.id0755.sdk.android.config.Config;
+import cn.id0755.sdk.android.config.TaskProperty;
+import cn.id0755.sdk.android.manager.iinterface.IChannelListener;
+import cn.id0755.sdk.android.manager.iinterface.IServerConnectionListener;
+import cn.id0755.sdk.android.handler.ProtocolClientHandler;
 import cn.id0755.sdk.android.utils.Log;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

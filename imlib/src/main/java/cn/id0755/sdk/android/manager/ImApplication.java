@@ -1,4 +1,4 @@
-package cn.id0755.im.manager;
+package cn.id0755.sdk.android.manager;
 
 import android.app.Application;
 

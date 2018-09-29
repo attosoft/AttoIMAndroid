@@ -1,4 +1,4 @@
-package cn.id0755.im.handler;
+package cn.id0755.sdk.android.handler;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;

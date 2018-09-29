@@ -1,13 +1,13 @@
-package cn.id0755.im.handler;
+package cn.id0755.sdk.android.handler;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Message;
-import cn.id0755.im.manager.iinterface.IChannelListener;
-import cn.id0755.im.utils.MessageUtil;
+import cn.id0755.sdk.android.manager.iinterface.IChannelListener;
 import cn.id0755.sdk.android.utils.Log;
+import cn.id0755.sdk.android.utils.MessageUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;

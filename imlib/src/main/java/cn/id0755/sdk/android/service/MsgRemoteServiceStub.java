@@ -1,4 +1,4 @@
-package cn.id0755.im.service;
+package cn.id0755.sdk.android.service;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,12 +8,12 @@ import android.os.RemoteException;
 import cn.id0755.im.IMessageService;
 import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
-import cn.id0755.im.entity.DeviceInfo;
-import cn.id0755.im.manager.ConnectState;
-import cn.id0755.im.manager.ConnectionManager;
-import cn.id0755.im.manager.iinterface.IServerConnectionListener;
-import cn.id0755.im.utils.RandomUtil;
+import cn.id0755.sdk.android.entity.DeviceInfo;
+import cn.id0755.sdk.android.manager.ConnectState;
+import cn.id0755.sdk.android.manager.ConnectionManager;
+import cn.id0755.sdk.android.manager.iinterface.IServerConnectionListener;
 import cn.id0755.sdk.android.utils.Log;
+import cn.id0755.sdk.android.utils.RandomUtil;
 
 /**
  * 运行于 :messageService进程中 自动处理与服务器的长连接

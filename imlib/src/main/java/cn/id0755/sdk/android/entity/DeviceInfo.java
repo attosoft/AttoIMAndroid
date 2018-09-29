@@ -1,4 +1,4 @@
-package cn.id0755.im.entity;
+package cn.id0755.sdk.android.entity;
 
 /**
  * 终端设备信息类

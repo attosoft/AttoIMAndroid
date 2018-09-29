@@ -1,4 +1,4 @@
-package cn.id0755.im.manager;
+package cn.id0755.sdk.android.manager;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 import cn.id0755.im.IMessageService;
 import cn.id0755.im.ITaskWrapper;
-import cn.id0755.im.config.TaskProperty;
-import cn.id0755.im.service.MsgRemoteService;
+import cn.id0755.sdk.android.config.TaskProperty;
+import cn.id0755.sdk.android.service.MsgRemoteService;
 import cn.id0755.sdk.android.utils.Log;
 
 public class MessageServiceManager {

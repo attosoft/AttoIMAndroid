@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.google.protobuf'
 
 android {
     compileSdkVersion Integer.parseInt(rootProject.ANDROID_BUILD_SDK_VERSION)
@@ -26,27 +27,43 @@ android {
     }
 }
 
-dependencies {
-    api fileTree(includes: ['*.jar'], dir: 'libs')
+//添加此段
+protobuf {
+    //配置protoc编译器
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0-alpha-3'
+    }
+    plugins {
+        javalite {
+            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+        }
+    }
+    //这里配置生成目录，编译后会在build的目录下生成对应的java文件
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                javalite {}
+            }
+        }
+    }
+}
+//指定原始.proto文件的位置
+android {
+    sourceSets {
+        main {
+            java {
+                srcDirs 'src/main/java'
+            }
+            proto {
+                srcDirs 'src/main/proto'
+            }
+        }
+    }
 }
 
-// 打出“MobileIMSDK4a.jar”，以便放到其它工程里使用
-//task makeJar(type: Jar) {
-//
-//    // 删除之前已打过的jar
-//    delete 'build/dist/MobileIMSDK4a.jar'
-//
-//    // 要打包的类目录
-//    from file('build/intermediates/classes/release')
-//    // 打包完成的jar包名
-//    archiveName = 'MobileIMSDK4a.jar'
-//    // 打包完成后的jar包位置
-//    destinationDir = file('build/dist')
-//
-//    // 过滤不需要的系统生成class
-//    exclude "**/**/BuildConfig.class"
-//    exclude "**/**/BuildConfig\$*.class"
-//    exclude "**/R.class"
-//    exclude "**/R\$*.class"
-//}
-//makeJar.dependsOn(build)
+dependencies {
+    api fileTree(includes: ['*.jar'], dir: 'libs')
+    implementation "io.netty:netty-all:${NETTY_VERSION}"
+    implementation "com.google.protobuf:protobuf-lite:${GOOGLE_PROTOBUF_LITE}"
+    implementation 'com.android.support:support-annotations:28.0.0'
+}

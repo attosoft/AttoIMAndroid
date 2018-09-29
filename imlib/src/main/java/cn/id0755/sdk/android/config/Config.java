@@ -1,4 +1,4 @@
-package cn.id0755.im.config;
+package cn.id0755.sdk.android.config;
 
 public class Config {
 //        public final static String HOST = "192.168.2.3";

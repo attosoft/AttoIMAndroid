@@ -1,4 +1,4 @@
-package cn.id0755.im.task;
+package cn.id0755.sdk.android.task;
 
 import android.os.Bundle;
 import android.os.IBinder;
@@ -7,7 +7,7 @@ import android.os.RemoteException;
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
-import cn.id0755.im.utils.MessageUtil;
+import cn.id0755.sdk.android.utils.MessageUtil;
 
 public class LoginTask extends ITaskWrapper.Stub implements ITaskWrapper {
     private Bundle mProperties = new Bundle();

@@ -1,4 +1,4 @@
-package cn.id0755.im.handler;
+package cn.id0755.sdk.android.handler;
 
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Message;

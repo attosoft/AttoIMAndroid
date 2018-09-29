@@ -1,6 +1,6 @@
-package cn.id0755.im.manager.iinterface;
+package cn.id0755.sdk.android.manager.iinterface;
 
-import cn.id0755.im.manager.ConnectState;
+import cn.id0755.sdk.android.manager.ConnectState;
 
 public interface IServerConnectionListener {
     /**

@@ -1,9 +1,9 @@
-package cn.id0755.im.store;
+package cn.id0755.sdk.android.store;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import cn.id0755.im.manager.ImApplication;
+import cn.id0755.sdk.android.manager.ImApplication;
 
 public class ConfigSp {
 

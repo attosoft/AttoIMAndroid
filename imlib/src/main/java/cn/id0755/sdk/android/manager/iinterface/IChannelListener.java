@@ -1,4 +1,4 @@
-package cn.id0755.im.manager.iinterface;
+package cn.id0755.sdk.android.manager.iinterface;
 
 import io.netty.channel.ChannelHandlerContext;
 

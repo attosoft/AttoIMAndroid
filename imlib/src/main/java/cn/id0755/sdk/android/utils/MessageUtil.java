@@ -1,4 +1,4 @@
-package cn.id0755.im.utils;
+package cn.id0755.sdk.android.utils;
 
 import cn.id0755.im.chat.proto.Message;
 

@@ -1,4 +1,4 @@
-package cn.id0755.im.service;
+package cn.id0755.sdk.android.service;
 
 import android.app.Service;
 import android.content.Intent;

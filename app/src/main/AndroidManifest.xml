@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
-        android:name=".manager.ImApplication"
+        android:name="cn.id0755.sdk.android.manager.ImApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -37,7 +37,7 @@
             android:theme="@style/AppTheme"
             android:name="cn.id0755.im.activity.MainActivity"
             android:label="@string/title_activity_login"/>
-        <service android:name=".service.MsgRemoteService"
+        <service android:name="cn.id0755.sdk.android.service.MsgRemoteService"
             android:process=":messageService"/>
     </application>
 
