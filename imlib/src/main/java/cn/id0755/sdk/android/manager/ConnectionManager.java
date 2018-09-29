@@ -208,7 +208,7 @@ public class ConnectionManager {
                             ch.pipeline().addLast(new ProtobufDecoder(Message.MessageData.getDefaultInstance()));
                             ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
                             ch.pipeline().addLast(new ProtobufEncoder());
-                            ch.pipeline().addLast(new ProtocolClientHandler(mChannelListener));
+                            ch.pipeline().addLast(new ProtocolClientHandler(mChannelListener,mSendMsgMap));
                         }
                     });
 
@@ -284,6 +284,10 @@ public class ConnectionManager {
     }
 
     private Map<Integer, ITaskWrapper> mSendMsgMap = new ConcurrentHashMap<>();
+
+    public ITaskWrapper getTaskById(int taskId){
+        return mSendMsgMap.remove(taskId);
+    }
 
     public boolean send(ITaskWrapper taskWrapper) {
         Log.d(TAG, "send : ");

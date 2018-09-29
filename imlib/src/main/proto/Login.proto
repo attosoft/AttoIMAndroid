@@ -4,6 +4,7 @@ package cn.id0755.im.chat.proto;
 message LoginRequest {
     string account=1;
     string password=2;
+    int32 taskId = 3;
 }
 
 message LoginResponse{
@@ -14,4 +15,5 @@ message LoginResponse{
         ERR_INVALI_PSW = 3;
     }
     string access_token=1;
+    int32 taskId = 2;
 }

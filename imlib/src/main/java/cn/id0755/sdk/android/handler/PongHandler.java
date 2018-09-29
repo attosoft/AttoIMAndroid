@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class PongHandler extends BaseBizHandler<HeartBeat.Pong>{
     private final static String TAG = PongHandler.class.getSimpleName();
+
     @Override
     protected void channelRead(ChannelHandlerContext ctx, HeartBeat.Pong pong) {
         Log.d(TAG,"channelRead : ");

@@ -1,8 +1,13 @@
 package cn.id0755.sdk.android.handler;
 
+import android.util.ArrayMap;
+
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.sdk.android.manager.iinterface.IChannelListener;
@@ -19,12 +24,14 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     private IChannelListener mChannelListener;
 
     private List<BaseBizHandler> mBizHandlerList = new LinkedList<>();
+    private Map<Integer,ITaskWrapper> mSendMsgMap = new HashMap<>();
 
     /**
      * Creates a client-side handler.
      */
-    public ProtocolClientHandler(IChannelListener channelListener) {
+    public ProtocolClientHandler(IChannelListener channelListener,Map<Integer,ITaskWrapper> sendMsgMap) {
         mChannelListener = channelListener;
+        mSendMsgMap = sendMsgMap;
         init();
     }
 
@@ -74,7 +81,6 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message.MessageData msg) throws Exception {
         Log.d(TAG, "channelRead0 | msg:" + msg.getCmdId());
-
         for (BaseBizHandler bizHandler : mBizHandlerList) {
             if (bizHandler.channelRead0(ctx, msg)) {
                 break;

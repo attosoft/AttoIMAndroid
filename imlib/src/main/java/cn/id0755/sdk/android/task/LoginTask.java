@@ -1,7 +1,6 @@
 package cn.id0755.sdk.android.task;
 
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
 
 import cn.id0755.im.ITaskWrapper;
@@ -11,6 +10,7 @@ import cn.id0755.sdk.android.utils.MessageUtil;
 
 public class LoginTask extends ITaskWrapper.Stub implements ITaskWrapper {
     private Bundle mProperties = new Bundle();
+
     public LoginTask() {
 
     }
@@ -26,7 +26,7 @@ public class LoginTask extends ITaskWrapper.Stub implements ITaskWrapper {
                 .setAccount("13510773000")
                 .setPassword("123456")
                 .build();
-        return MessageUtil.wrap(Message.CMD_ID.LOGIN_REQ,loginRequest).toByteArray();
+        return MessageUtil.wrap(Message.CMD_ID.LOGIN_REQ, loginRequest).toByteArray();
     }
 
     @Override
