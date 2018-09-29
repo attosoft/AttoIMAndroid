@@ -1,7 +1,5 @@
 package cn.id0755.im.handler;
 
-import com.google.protobuf.MessageLite;
-
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,19 +1,17 @@
 syntax = "proto3";
-import "Message.proto";
 package cn.id0755.im.chat.proto;
 
 message LoginRequest {
-    string account = 1;
-    string password = 2;
-    CMD_ID cmd_id = 3;
+    string account=1;
+    string password=2;
 }
 
-message LoginResponse {
+message LoginResponse{
     enum Error {
         ERR_OK = 0;
         ERR_SYS = 1;
         ERR_INVALI_ACCOUNT = 2;
         ERR_INVALI_PSW = 3;
     }
-    string access_token = 1;
+    string access_token=1;
 }

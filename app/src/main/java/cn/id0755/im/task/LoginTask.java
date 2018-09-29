@@ -23,9 +23,8 @@ public class LoginTask extends ITaskWrapper.Stub implements ITaskWrapper {
     @Override
     public byte[] req2buf() throws RemoteException {
         Login.LoginRequest loginRequest = Login.LoginRequest.newBuilder()
-                .setAccount("atto")
+                .setAccount("13510773000")
                 .setPassword("123456")
-                .setCmdId(Message.CMD_ID.LOGIN_REQ)
                 .build();
         return MessageUtil.wrap(Message.CMD_ID.LOGIN_REQ,loginRequest).toByteArray();
     }

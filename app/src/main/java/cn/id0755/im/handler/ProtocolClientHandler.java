@@ -1,14 +1,9 @@
 package cn.id0755.im.handler;
 
-import com.google.protobuf.MessageLite;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import cn.id0755.im.chat.proto.HeartBeat;
-import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.im.manager.iinterface.IChannelListener;
 import cn.id0755.im.utils.MessageUtil;
@@ -35,6 +30,7 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
 
     private void init() {
         mBizHandlerList.add(new LoginHandler());
+        mBizHandlerList.add(new PongHandler());
     }
 
     @Override

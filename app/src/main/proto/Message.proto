@@ -9,7 +9,7 @@ enum CMD_ID {
     CMD_SEND_MESSAGE = 3;
     CMD_CONVERSATION_LIST = 4;
     CMD_JOINTOPIC = 5;
-    CMD_LEFTTOPIC = 7;
+    PUSH= 7;
 
     LOGIN_REQ = 8;
     LOGIN_RESP = 9;
