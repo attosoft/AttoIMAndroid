@@ -2,6 +2,7 @@ package cn.id0755.sdk.android.manager;
 
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -23,6 +24,7 @@ import cn.id0755.sdk.android.manager.iinterface.IChannelListener;
 import cn.id0755.sdk.android.manager.iinterface.IServerConnectionListener;
 import cn.id0755.sdk.android.handler.ProtocolClientHandler;
 import cn.id0755.sdk.android.utils.Log;
+import cn.id0755.sdk.android.utils.MessageUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -90,7 +92,15 @@ public class ConnectionManager {
             new LinkedBlockingQueue<Runnable>(1), new ThreadFactory() {
         @Override
         public Thread newThread(@NonNull Runnable r) {
-            return new Thread(r, "mSendMsgExecutor");
+            Thread thread = new Thread(r, "mSendMsgExecutor");
+//            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//                @Override
+//                public void uncaughtException(Thread t, Throwable e) {
+//                    Log.e(TAG,"mSendMsgExecutor | uncaughtException:" + e.getMessage());
+//                    mSendMsgExecutor.submit(mSendMsgRunnable);
+//                }
+//            });
+            return thread;
         }
     }, new RejectedExecutionHandler() {
         @Override
@@ -112,6 +122,7 @@ public class ConnectionManager {
         @Override
         public void run() {
             while (true) {
+                Log.d(TAG, "mSendMsgRunnable run");
                 ITaskWrapper taskWrapper = null;
                 try {
                     taskWrapper = mTaskQueue.take();
@@ -126,23 +137,31 @@ public class ConnectionManager {
                         mTaskQueue.offer(taskWrapper);
                     } else {
                         try {
-                            //这一步远程调用会阻塞线程
+                            //远程调用会阻塞当前线程
                             final byte[] data = taskWrapper.req2buf();
-                            int taskId = taskWrapper.getProperties().getInt(TaskProperty.OPTIONS_TASK_ID);
-                            Attribute<Map<Integer, ITaskWrapper>> taskAttribute = mChannel.attr(AttributeKey.valueOf(KEY_TASK));
-                            taskAttribute.get().put(taskId, taskWrapper);
+                            Message.MessageData messageData = null;
+                            try {
+                                messageData = Message.MessageData.getDefaultInstance()
+                                        .getParserForType()
+                                        .parseFrom(data, 0, data.length);
+                            } catch (InvalidProtocolBufferException e) {
+                                e.printStackTrace();
+                            }
+                            if (messageData == null) {
+                                return;
+                            }
+                            String seqId = messageData.getSeqId();
+                            Attribute<Map<String, ITaskWrapper>> taskAttribute = mChannel.attr(AttributeKey.valueOf(KEY_TASK));
+                            if (taskAttribute.get() == null) {
+                                taskAttribute.set(new ConcurrentHashMap<>());
+                            }
+                            taskAttribute.get().put(seqId, taskWrapper);
 
+                            Message.MessageData finalMessageData = messageData;
                             mChannel.eventLoop().submit(new Runnable() {
                                 @Override
                                 public void run() {
-                                    try {
-                                        Message.MessageData messageData = Message.MessageData.getDefaultInstance()
-                                                .getParserForType()
-                                                .parseFrom(data, 0, data.length);
-                                        mChannel.writeAndFlush(messageData);
-                                    } catch (InvalidProtocolBufferException e) {
-                                        e.printStackTrace();
-                                    }
+                                    mChannel.writeAndFlush(finalMessageData);
                                 }
                             });
                         } catch (RemoteException e) {
@@ -311,15 +330,11 @@ public class ConnectionManager {
 
     public void cancel(int taskId) {
         Log.d(TAG, "cancel | taskId:" + taskId);
-        for (ITaskWrapper taskWrapper : mTaskQueue) {
-            try {
-                if (taskWrapper.getProperties().getInt(TaskProperty.OPTIONS_TASK_ID) == taskId) {
-                    mTaskQueue.remove(taskWrapper);
-                    return;
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+//        for (ITaskWrapper pair : mTaskQueue) {
+//            if (pair.first == taskId) {
+//                mTaskQueue.remove(pair);
+//                return;
+//            }
+//        }
     }
 }

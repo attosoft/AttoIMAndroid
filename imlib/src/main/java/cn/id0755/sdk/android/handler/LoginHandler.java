@@ -2,6 +2,8 @@ package cn.id0755.sdk.android.handler;
 
 import android.os.RemoteException;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -17,24 +19,15 @@ import io.netty.util.AttributeKey;
 public class LoginHandler extends BaseBizHandler<Login.LoginResponse> {
 
     @Override
-    protected void channelRead(ChannelHandlerContext ctx, Login.LoginResponse loginResponse) {
-        Attribute<Map<Integer, ITaskWrapper>> attribute = ctx.channel().attr(AttributeKey.valueOf(ConnectionManager.KEY_TASK));
-        Map<Integer, ITaskWrapper> taskWrapperMap = attribute.get();
-        ITaskWrapper taskWrapper = null;
-        if (taskWrapperMap != null && taskWrapperMap.containsKey(loginResponse.getTaskId())) {
-            taskWrapper = taskWrapperMap.remove(loginResponse.getTaskId());
-        }
-        ITaskWrapper finalTaskWrapper = taskWrapper;
+    protected void channelRead(ChannelHandlerContext ctx, Login.LoginResponse loginResponse, ITaskWrapper taskWrapper) {
         ConnectionManager.mWorkerExecutor.submit(new Runnable() {
             @Override
             public void run() {
-                if (finalTaskWrapper != null) {
-                    try {
-                        finalTaskWrapper.buf2resp(loginResponse.getAccessToken().getBytes());
-                        finalTaskWrapper.onTaskEnd(0, 0);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    taskWrapper.buf2resp(loginResponse.toByteArray());
+                    taskWrapper.onTaskEnd(0, 0);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
                 }
             }
         });

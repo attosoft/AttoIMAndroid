@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import cn.id0755.im.IMessageService;
 import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
+import cn.id0755.sdk.android.config.TaskProperty;
 import cn.id0755.sdk.android.entity.DeviceInfo;
 import cn.id0755.sdk.android.manager.ConnectState;
 import cn.id0755.sdk.android.manager.ConnectionManager;
@@ -67,8 +68,9 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
     @Override
     public int send(ITaskWrapper taskWrapper, Bundle taskProperties) throws RemoteException {
         //运行于binder线程
+        int taskId = ai.incrementAndGet();
         ConnectionManager.getInstance().send(taskWrapper);
-        return ai.incrementAndGet();
+        return taskId;
     }
 
     @Override

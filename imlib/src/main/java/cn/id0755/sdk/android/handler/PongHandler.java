@@ -1,5 +1,6 @@
 package cn.id0755.sdk.android.handler;
 
+import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.sdk.android.utils.Log;
@@ -9,7 +10,7 @@ public class PongHandler extends BaseBizHandler<HeartBeat.Pong>{
     private final static String TAG = PongHandler.class.getSimpleName();
 
     @Override
-    protected void channelRead(ChannelHandlerContext ctx, HeartBeat.Pong pong) {
+    protected void channelRead(ChannelHandlerContext ctx, HeartBeat.Pong pong, ITaskWrapper taskWrapper) {
         Log.d(TAG,"channelRead : ");
     }
 

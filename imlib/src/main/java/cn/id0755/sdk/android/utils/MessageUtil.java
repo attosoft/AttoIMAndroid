@@ -9,4 +9,12 @@ public class MessageUtil {
         builder.setContent(messageLite != null ? messageLite.toByteString() : null);
         return builder.build();
     }
+
+    public static Message.MessageData wrap(Message.CMD_ID cmd_id, String seqId,com.google.protobuf.AbstractMessageLite messageLite) {
+        Message.MessageData.Builder builder = Message.MessageData.newBuilder();
+        builder.setCmdId(cmd_id);
+        builder.setSeqId(seqId);
+        builder.setContent(messageLite != null ? messageLite.toByteString() : null);
+        return builder.build();
+    }
 }

@@ -1,5 +1,6 @@
 package cn.id0755.sdk.android.handler;
 
+import android.os.RemoteException;
 import android.util.ArrayMap;
 
 import java.lang.ref.WeakReference;
@@ -11,12 +12,15 @@ import java.util.Map;
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.HeartBeat;
 import cn.id0755.im.chat.proto.Message;
+import cn.id0755.sdk.android.manager.ConnectionManager;
 import cn.id0755.sdk.android.manager.iinterface.IChannelListener;
 import cn.id0755.sdk.android.utils.Log;
 import cn.id0755.sdk.android.utils.MessageUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 
 
 public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.MessageData> {
@@ -80,11 +84,31 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message.MessageData msg) throws Exception {
         Log.d(TAG, "channelRead0 | msg:" + msg.getCmdId());
-        for (BaseBizHandler bizHandler : mBizHandlerList) {
-            if (bizHandler.channelRead0(ctx, msg)) {
-                break;
-            }
+//        for (BaseBizHandler bizHandler : mBizHandlerList) {
+//            if (bizHandler.channelRead0(ctx, msg)) {
+//                break;
+//            }
+//        }
+        Attribute<Map<String, ITaskWrapper>> attribute = ctx.channel().attr(AttributeKey.valueOf(ConnectionManager.KEY_TASK));
+        Map<String, ITaskWrapper> taskWrapperMap = attribute.get();
+        ITaskWrapper taskWrapper = null;
+        if (taskWrapperMap != null && taskWrapperMap.containsKey(msg.getSeqId())) {
+            taskWrapper = taskWrapperMap.remove(msg.getSeqId());
         }
+        ITaskWrapper finalTaskWrapper = taskWrapper;
+        ConnectionManager.mWorkerExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (finalTaskWrapper != null) {
+                        finalTaskWrapper.buf2resp(msg.getContent().toByteArray());
+                        finalTaskWrapper.onTaskEnd(0, 0);
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

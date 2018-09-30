@@ -162,9 +162,8 @@ public class MessageServiceManager {
                 return;
             }
             try {
-                int taskId = mMessageService.send(taskWrapper, taskWrapper.getProperties());
-                /**关联taskId*/
-                taskWrapper.getProperties().putInt(TaskProperty.OPTIONS_TASK_ID, taskId);
+                //远程调用阻塞线程
+                mMessageService.send(taskWrapper, taskWrapper.getProperties());
             } catch (RemoteException e) {
                 Log.e(TAG, "调用MessageService发送任务异常！");
                 //尝试添加回任务队列。

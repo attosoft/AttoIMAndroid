@@ -15,8 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import cn.id0755.im.task.LoginTask;
 import cn.id0755.sdk.android.manager.MessageServiceManager;
-import cn.id0755.sdk.android.task.LoginTask;
 
 import java.util.concurrent.Executors;
 
@@ -26,7 +26,7 @@ import cn.id0755.sdk.android.store.ConfigSp;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity{
+public class LoginActivity extends AppCompatActivity {
 
     private final static String TAG = "LoginActivity";
     /**
@@ -41,7 +41,6 @@ public class LoginActivity extends AppCompatActivity{
     private CheckBox mAutoLogin;
     private CheckBox mRememberPassword;
     private Button mEmailSignInButton;
-
 
 
     @Override
@@ -79,7 +78,7 @@ public class LoginActivity extends AppCompatActivity{
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     @Override
                     public void run() {
-                        MessageServiceManager.getInstance().send(new LoginTask());
+                        MessageServiceManager.getInstance().send(new LoginTask("10086", "123456"));
                     }
                 });
             }
