@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -37,8 +39,11 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.internal.ConcurrentSet;
 
 public class ConnectionManager {
     private final static String TAG = ConnectionManager.class.getSimpleName();
@@ -94,6 +99,15 @@ public class ConnectionManager {
         }
     });
 
+    public static final String KEY_TASK = "key_task";
+    public final static ThreadPoolExecutor mWorkerExecutor = new ThreadPoolExecutor(2, 4, 10, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(20), new ThreadFactory() {
+        @Override
+        public Thread newThread(@NonNull Runnable runnable) {
+            return new Thread(runnable, "mWorkerExecutor");
+        }
+    });
+
     private Runnable mSendMsgRunnable = new Runnable() {
         @Override
         public void run() {
@@ -112,7 +126,12 @@ public class ConnectionManager {
                         mTaskQueue.offer(taskWrapper);
                     } else {
                         try {
+                            //这一步远程调用会阻塞线程
                             final byte[] data = taskWrapper.req2buf();
+                            int taskId = taskWrapper.getProperties().getInt(TaskProperty.OPTIONS_TASK_ID);
+                            Attribute<Map<Integer, ITaskWrapper>> taskAttribute = mChannel.attr(AttributeKey.valueOf(KEY_TASK));
+                            taskAttribute.get().put(taskId, taskWrapper);
+
                             mChannel.eventLoop().submit(new Runnable() {
                                 @Override
                                 public void run() {
@@ -127,6 +146,7 @@ public class ConnectionManager {
                                 }
                             });
                         } catch (RemoteException e) {
+                            Log.e(TAG, "mSendMsgRunnable | " + e.getMessage());
                             e.printStackTrace();
                         }
                     }
@@ -145,7 +165,7 @@ public class ConnectionManager {
     /**
      * channel 锁
      */
-    private Object mChannelLock = new Object();
+    private final Object mChannelLock = new Object();
 
     private IServerConnectionListener mServerConnectionListener = null;
 
@@ -208,7 +228,7 @@ public class ConnectionManager {
                             ch.pipeline().addLast(new ProtobufDecoder(Message.MessageData.getDefaultInstance()));
                             ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
                             ch.pipeline().addLast(new ProtobufEncoder());
-                            ch.pipeline().addLast(new ProtocolClientHandler(mChannelListener,mSendMsgMap));
+                            ch.pipeline().addLast(new ProtocolClientHandler(mChannelListener));
                         }
                     });
 
@@ -283,30 +303,23 @@ public class ConnectionManager {
         }
     }
 
-    private Map<Integer, ITaskWrapper> mSendMsgMap = new ConcurrentHashMap<>();
-
-    public ITaskWrapper getTaskById(int taskId){
-        return mSendMsgMap.remove(taskId);
-    }
-
     public boolean send(ITaskWrapper taskWrapper) {
         Log.d(TAG, "send : ");
-        boolean success = mTaskQueue.offer(taskWrapper);
-        try {
-            mSendMsgMap.put(taskWrapper.getProperties().getInt(TaskProperty.OPTIONS_TASK_ID), taskWrapper);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return success;
+        //存放到队列中是为了：长链可能断开，需要连接状态才能发消息。
+        return mTaskQueue.offer(taskWrapper);
     }
 
-    public boolean cancel(int taskId) {
-        Log.d(TAG, "cancel | taskId:"+taskId);
-        ITaskWrapper taskWrapper = mSendMsgMap.get(taskId);
-        boolean success = mTaskQueue.remove(taskWrapper);
-        if (success) {
-            mSendMsgMap.remove(taskId);
+    public void cancel(int taskId) {
+        Log.d(TAG, "cancel | taskId:" + taskId);
+        for (ITaskWrapper taskWrapper : mTaskQueue) {
+            try {
+                if (taskWrapper.getProperties().getInt(TaskProperty.OPTIONS_TASK_ID) == taskId) {
+                    mTaskQueue.remove(taskWrapper);
+                    return;
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
-        return success;
     }
 }

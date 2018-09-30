@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import cn.id0755.im.IMessageService;
 import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
@@ -26,6 +28,7 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
     private Context mContext;
 
     private Handler mHandler = new Handler();
+    private final static AtomicInteger ai = new AtomicInteger();
 
     private IServerConnectionListener mConnectionListener = new IServerConnectionListener() {
         @Override
@@ -63,7 +66,9 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
 
     @Override
     public int send(ITaskWrapper taskWrapper, Bundle taskProperties) throws RemoteException {
-        return ConnectionManager.getInstance().send(taskWrapper) ? 1 : 0;
+        //运行于binder线程
+        ConnectionManager.getInstance().send(taskWrapper);
+        return ai.incrementAndGet();
     }
 
     @Override

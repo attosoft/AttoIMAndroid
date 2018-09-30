@@ -11,4 +11,5 @@ interface ITaskWrapper {
     int buf2resp(in byte[] buf);
 
     void onTaskEnd(in int errType, in int errCode);
+
 }

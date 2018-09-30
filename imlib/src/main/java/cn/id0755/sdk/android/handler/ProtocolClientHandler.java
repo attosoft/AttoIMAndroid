@@ -2,6 +2,7 @@ package cn.id0755.sdk.android.handler;
 
 import android.util.ArrayMap;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,14 +25,12 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     private IChannelListener mChannelListener;
 
     private List<BaseBizHandler> mBizHandlerList = new LinkedList<>();
-    private Map<Integer,ITaskWrapper> mSendMsgMap = new HashMap<>();
 
     /**
      * Creates a client-side handler.
      */
-    public ProtocolClientHandler(IChannelListener channelListener,Map<Integer,ITaskWrapper> sendMsgMap) {
+    public ProtocolClientHandler(IChannelListener channelListener) {
         mChannelListener = channelListener;
-        mSendMsgMap = sendMsgMap;
         init();
     }
 
