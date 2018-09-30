@@ -15,12 +15,12 @@ message SendMessageRequest {
 message SendMessageResponse {
     enum Error {
         ERR_OK = 0;
-        ERR_SYS = -1;
+        ERR_FAIL = -1;
     }
 
     int32 err_code = 1;
-     string err_msg = 2;
-     string from = 3;
-     string text = 4;
-     string topic = 5;
+    string err_msg = 2;
+    string from = 3;
+    string text = 4;
+    string topic = 5;
 }

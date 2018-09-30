@@ -101,8 +101,8 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
             public void run() {
                 try {
                     if (finalTaskWrapper != null) {
-                        finalTaskWrapper.buf2resp(msg.getContent().toByteArray());
-                        finalTaskWrapper.onTaskEnd(0, 0);
+                        int errorCode = finalTaskWrapper.buf2resp(msg.getContent().toByteArray());
+                        finalTaskWrapper.onTaskEnd(1, errorCode);
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id="@+id/cl_contain"
+    android:layout_height="wrap_content"
+    android:paddingBottom="4dp"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="4dp">
+
+    <TextView
+        android:id="@+id/tv_topic_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="topic_name" />
+
+    <TextView
+        android:id="@+id/tv_last_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="last_msg"
+        app:layout_constraintTop_toBottomOf="@+id/tv_topic_name" />
+</android.support.constraint.ConstraintLayout>

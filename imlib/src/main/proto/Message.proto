@@ -4,7 +4,7 @@ package cn.id0755.im.chat.proto;
 enum CMD_ID {
 //    CMD_ID_INVALID = -1;
     CMD_UNKNOWN = 0;
-    CMD_HELLO = 1;
+    MESSAGE = 1;
     CMD_AUTH = 2;
     CMD_SEND_MESSAGE = 3;
     CMD_CONVERSATION_LIST = 4;

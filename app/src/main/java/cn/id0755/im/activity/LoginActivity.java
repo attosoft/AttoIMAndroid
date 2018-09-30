@@ -1,5 +1,6 @@
 package cn.id0755.im.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import cn.id0755.im.chat.proto.Login;
+import cn.id0755.im.task.ITaskListener;
 import cn.id0755.im.task.LoginTask;
 import cn.id0755.sdk.android.manager.MessageServiceManager;
 
@@ -78,7 +81,24 @@ public class LoginActivity extends AppCompatActivity {
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     @Override
                     public void run() {
-                        MessageServiceManager.getInstance().send(new LoginTask("10086", "123456"));
+                        MessageServiceManager.getInstance().send(
+                                new LoginTask("10086", "123456")
+                                        .setListener(new ITaskListener<Login.LoginResponse>() {
+                                            @Override
+                                            public void onResp(Login.LoginResponse resp) {
+                                                if (resp.getAccessToken() != null){
+                                                    Intent intent = new Intent();
+                                                    intent.setClass(LoginActivity.this,MainActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onTaskEnd(int errType, int errCode) {
+
+                                            }
+                                        }));
                     }
                 });
             }
