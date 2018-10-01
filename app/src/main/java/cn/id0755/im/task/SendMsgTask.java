@@ -17,6 +17,38 @@ public class SendMsgTask extends ITaskWrapper.Stub implements ITaskWrapper {
     public Bundle getProperties() throws RemoteException {
         return null;
     }
+
+    public SendMsgTask setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+        return this;
+    }
+
+    public SendMsgTask setFrom(String from) {
+        this.from = from;
+        return this;
+    }
+
+    public SendMsgTask setTo(String to) {
+        this.to = to;
+        return this;
+    }
+
+    public SendMsgTask setText(String text) {
+        this.text = text;
+        return this;
+    }
+
+    public SendMsgTask setTopic(String topic) {
+        this.topic = topic;
+        return this;
+    }
+
+    private String accessToken = null;
+    private String from = null;
+    private String to = null;
+    private String text = null;
+    private String topic = null;
+
     private ITaskListener<Chat.SendMessageResponse> listener = null;
 
     public SendMsgTask setListener(ITaskListener<Chat.SendMessageResponse> listener) {
@@ -28,13 +60,13 @@ public class SendMsgTask extends ITaskWrapper.Stub implements ITaskWrapper {
     public byte[] req2buf() throws RemoteException {
         UUID uuid = UUID.randomUUID();
         Chat.SendMessageRequest sendMessageRequest = Chat.SendMessageRequest.newBuilder()
-                .setAccessToken("")
-                .setFrom("10086")
-                .setText("hello world")
-                .setTo("10000")
-                .setTopic("")
+                .setAccessToken(accessToken)
+                .setFrom(from)
+                .setText(text)
+                .setTo(to)
+                .setTopic(topic)
                 .build();
-        return MessageUtil.wrap(Message.CMD_ID.LOGIN_REQ, uuid.toString(), sendMessageRequest).toByteArray();
+        return MessageUtil.wrap(Message.CMD_ID.SEND_MESSAGE_REQ, uuid.toString(), sendMessageRequest).toByteArray();
     }
 
     @Override
@@ -53,7 +85,7 @@ public class SendMsgTask extends ITaskWrapper.Stub implements ITaskWrapper {
 
     @Override
     public void onTaskEnd(int errType, int errCode) throws RemoteException {
-        if (listener != null){
+        if (listener != null) {
             listener.onTaskEnd(errType, errCode);
         }
     }

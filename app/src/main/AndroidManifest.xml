@@ -34,11 +34,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/AppTheme"
             android:name="cn.id0755.im.activity.MainActivity"
-            android:label="@string/title_activity_login"/>
-        <service android:name="cn.id0755.sdk.android.service.MsgRemoteService"
-            android:process=":messageService"/>
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.ChatActivity"
+            android:label="chat"
+            android:theme="@style/AppTheme" />
+
+        <service
+            android:name="cn.id0755.sdk.android.service.MsgRemoteService"
+            android:process=":messageService" />
     </application>
 
 </manifest>

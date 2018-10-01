@@ -2,8 +2,28 @@ syntax = "proto3";
 package cn.id0755.im.chat.proto;
 
 
+message TopicInfo {
+    TopicType topicType = 1;
+    string topic = 2;
+    string content = 3;
+
+}
+
+//主题类型
+enum TopicType {
+    //系统
+    SYS = 0;
+    //个人
+    PERSON = 1;
+    //群组
+    GROUP = 2;
+    //广播
+    BROADCAST = 3;
+}
+
 message TopicRequest {
-     string topic = 1;
+    TopicType topicType = 1;
+    string topic = 2;
 }
 
 
@@ -11,9 +31,9 @@ message TopicResponse {
 
     enum Error {
         ERR_OK = 0;
-        ERR_SYS = -1;
+        ERR_FAIL = -1;
     }
 
-     int32 err_code = 1;
-     string err_msg = 2;
+    int32 err_code = 1;
+    string err_msg = 2;
 }

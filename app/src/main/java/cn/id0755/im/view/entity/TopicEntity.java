@@ -1,4 +1,6 @@
 package cn.id0755.im.view.entity;
 
-public class TopicEntity {
+import java.io.Serializable;
+
+public class TopicEntity implements Serializable{
 }

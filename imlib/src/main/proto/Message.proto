@@ -2,23 +2,25 @@ syntax = "proto3";
 package cn.id0755.im.chat.proto;
 
 enum CMD_ID {
-//    CMD_ID_INVALID = -1;
-    CMD_UNKNOWN = 0;
-    MESSAGE = 1;
-    CMD_AUTH = 2;
-    CMD_SEND_MESSAGE = 3;
-    CMD_CONVERSATION_LIST = 4;
-    CMD_JOINTOPIC = 5;
-    PUSH= 7;
+    //    CMD_ID_INVALID = -1;
+    UNKNOWN = 0;
+    SEND_MESSAGE_REQ = 1;
+    SEND_MESSAGE_RESP = 2;
+    AUTH = 3;
+    CONVERSATION_LIST = 4;
+    SUBJECT_TOPIC = 5;
+    PUSH = 7;
 
     LOGIN_REQ = 8;
     LOGIN_RESP = 9;
-    PING=10;
-    PONG=11;
+    PING = 10;
+    PONG = 11;
+    SUBJECT_TOPIC_REQ = 12;
+    SUBJECT_TOPIC_RESP = 13;
 }
 
 message MessageData {
-     CMD_ID cmdId = 1;
-     bytes content = 2;
-     string seqId = 3;
+    CMD_ID cmdId = 1;
+    bytes content = 2;
+    string seqId = 3;
 }

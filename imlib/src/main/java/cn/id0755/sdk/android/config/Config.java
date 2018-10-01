@@ -1,8 +1,8 @@
 package cn.id0755.sdk.android.config;
 
 public class Config {
-//        public final static String HOST = "192.168.2.3";
-    public final static String HOST = "172.20.205.83";
+        public final static String HOST = "192.168.31.29";
+//    public final static String HOST = "172.20.205.83";
     /**
      * 监听端口
      */
