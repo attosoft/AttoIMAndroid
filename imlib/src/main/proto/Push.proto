@@ -3,6 +3,8 @@ package cn.id0755.im.chat.proto;
 import "Topic.proto";
 message Message {
      TopicType topicType = 1;
-     string content = 2;
-     string from = 3;
+     string topicId = 2;
+     string content = 3;
+     string from = 4;
+     string to = 5;
 }

@@ -1,9 +1,6 @@
 package cn.id0755.im.activity;
 
-import android.app.DownloadManager;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -17,23 +14,12 @@ import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.R;
-import cn.id0755.im.biz.RequestType;
 import cn.id0755.im.biz.TextMsgReq;
 import cn.id0755.im.biz.TextMsgResp;
-import cn.id0755.im.chat.proto.Chat;
 import cn.id0755.im.chat.proto.Topic;
 import cn.id0755.sdk.android.biz.IRequestListener;
-import cn.id0755.sdk.android.service.push.PushMsgFilterStub;
-import cn.id0755.sdk.android.task.CommonTask;
-import cn.id0755.sdk.android.task.ITaskListener;
-import cn.id0755.im.task.SendMsgTask;
 import cn.id0755.im.view.binder.MsgLeftViewBinder;
 import cn.id0755.im.view.binder.MsgRightViewBinder;
 import cn.id0755.im.view.entity.MsgEntity;
