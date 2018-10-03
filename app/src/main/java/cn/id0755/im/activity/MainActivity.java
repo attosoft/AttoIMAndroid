@@ -10,13 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.id0755.im.R;
+import cn.id0755.im.biz.GetPublishReq;
+import cn.id0755.im.biz.GetPublishResp;
+import cn.id0755.im.biz.SubjectReq;
+import cn.id0755.im.biz.SubjectResp;
 import cn.id0755.im.chat.proto.Topic;
+import cn.id0755.sdk.android.biz.IRequestListener;
 import cn.id0755.sdk.android.task.ITaskListener;
 import cn.id0755.im.task.SubjectTask;
 import cn.id0755.im.view.binder.DefaultTopicViewBinder;
 import cn.id0755.im.view.entity.TopicEntity;
 import cn.id0755.im.view.listener.ItemClickListener;
-import cn.id0755.sdk.android.manager.MessageServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceManager;
 import cn.id0755.sdk.android.utils.Log;
 import me.drakeet.multitype.MultiTypeAdapter;
 
@@ -47,26 +52,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }));
         mTopicListAdapter.setItems(mTopicListData);
-        mTopicListData.add(new TopicEntity());
-        mTopicListData.add(new TopicEntity());
         mTopicListAdapter.notifyDataSetChanged();
         initListeners();
 
-        SubjectTask subjectTask = new SubjectTask();
-        subjectTask
-                .setTopic("10086")
-                .setListener(new ITaskListener<Topic.TopicResponse>() {
+        GetPublishReq req = new GetPublishReq();
+        req.setListener(new IRequestListener<GetPublishResp>() {
+            @Override
+            public void onSuccess(GetPublishResp getPublishResp) {
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onResp(Topic.TopicResponse resp) {
-                        Log.d(TAG, "onResp : " + resp.getErrMsg());
-                    }
-
-                    @Override
-                    public void onTaskEnd(int errType, int errCode) {
-
+                    public void run() {
+                        mTopicListData.addAll(getPublishResp.getTopicEntities());
+                        mTopicListAdapter.notifyDataSetChanged();
                     }
                 });
-        MessageServiceManager.getInstance().send(subjectTask);
+                SubjectReq subjectReq = new SubjectReq();
+                subjectReq.setTopicEntities(getPublishResp.getTopicEntities())
+                        .setListener(new IRequestListener<SubjectResp>() {
+                            @Override
+                            public void onSuccess(SubjectResp subjectResp) {
+                                Log.w(TAG,"SubjectReq onSuccess:" + subjectResp.toString());
+                            }
+                        });
+                MsgServiceManager.getInstance().send(subjectReq);
+            }
+        });
+        MsgServiceManager.getInstance().send(req);
     }
 
     private void initListeners() {

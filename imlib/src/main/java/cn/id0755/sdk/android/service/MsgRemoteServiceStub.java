@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.id0755.im.IMessageService;
@@ -14,7 +12,6 @@ import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.im.chat.proto.Push;
-import cn.id0755.sdk.android.config.TaskProperty;
 import cn.id0755.sdk.android.entity.DeviceInfo;
 import cn.id0755.sdk.android.manager.ConnectState;
 import cn.id0755.sdk.android.manager.ConnectionManager;
@@ -32,8 +29,6 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
     public static final String DEVICE_TYPE = "android-" + android.os.Build.VERSION.SDK_INT;
     private DeviceInfo info = new DeviceInfo(DEVICE_NAME, DEVICE_TYPE);
     private Context mContext;
-
-    private List<IPushMessageFilter> mMessageFilters = new CopyOnWriteArrayList<>();
 
     private Handler mHandler = new Handler();
     private final static AtomicInteger ai = new AtomicInteger();
@@ -67,23 +62,9 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
         }
     };
 
-    private IPushMessageListener mPushMessageListener = new IPushMessageListener() {
-        @Override
-        public void pushMessage(Push.Message message) {
-            for (IPushMessageFilter filter : mMessageFilters) {
-                try {
-                    filter.onReceive(Message.CMD_ID.PUSH_VALUE, message.toByteArray());
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
-
     public MsgRemoteServiceStub(Context context) {
         mContext = context;
         ConnectionManager.getInstance().autoConnect(mConnectionListener);
-        ConnectionManager.getInstance().setPushMessageListener(mPushMessageListener);
     }
 
     @Override
@@ -101,12 +82,12 @@ public class MsgRemoteServiceStub extends IMessageService.Stub {
 
     @Override
     public void registerPushMessageFilter(IPushMessageFilter filter) throws RemoteException {
-        mMessageFilters.add(filter);
+        ConnectionManager.getInstance().setPushMessageListener(filter);
     }
 
     @Override
     public void unregisterPushMessageFilter(IPushMessageFilter filter) throws RemoteException {
-        mMessageFilters.remove(filter);
+
     }
 
     @Override

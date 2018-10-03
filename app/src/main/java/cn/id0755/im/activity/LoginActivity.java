@@ -19,7 +19,7 @@ import android.widget.TextView;
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.sdk.android.task.ITaskListener;
 import cn.id0755.im.task.LoginTask;
-import cn.id0755.sdk.android.manager.MessageServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceManager;
 
 import java.util.concurrent.Executors;
 
@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     @Override
                     public void run() {
-                        MessageServiceManager.getInstance().send(
+                        MsgServiceManager.getInstance().send(
                                 new LoginTask("10086", "123456")
                                         .setListener(new ITaskListener<Login.LoginResponse>() {
                                             @Override

@@ -22,35 +22,33 @@ import cn.id0755.sdk.android.biz.BaseReq;
 import cn.id0755.sdk.android.config.ImApplication;
 import cn.id0755.sdk.android.config.TaskProperty;
 import cn.id0755.sdk.android.service.MsgRemoteService;
+import cn.id0755.sdk.android.service.push.IPushObserver;
+import cn.id0755.sdk.android.service.push.PushMsgFilterStub;
 import cn.id0755.sdk.android.task.CommonTask;
 import cn.id0755.sdk.android.utils.Log;
 
-public class MessageServiceManager {
-    private final static String TAG = MessageServiceManager.class.getSimpleName();
+public class MsgServiceManager {
+    private final static String TAG = MsgServiceManager.class.getSimpleName();
 
-    private MessageServiceManager() {
+    private MsgServiceManager() {
         init();
     }
 
-    private ThreadPoolExecutor mPushExecutor = new ThreadPoolExecutor(1, 3, 10,
-            TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-            new ThreadFactory() {
-                private int mCount = 0;
-
-                @Override
-                public Thread newThread(@NonNull Runnable r) {
-                    return new Thread(r, "mPushExecutor" + mCount++);
-                }
-            });
-
-    private ThreadPoolExecutor mRemoteExecutor = new ThreadPoolExecutor(0, 1, 10,
+    private ThreadPoolExecutor mRemoteExecutor = new ThreadPoolExecutor(1, 4, 10,
             TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
             new ThreadFactory() {
                 private int mCount = 0;
 
                 @Override
                 public Thread newThread(@NonNull Runnable r) {
-                    return new Thread(r, "MessageServiceManager " + mCount++);
+                    Thread thread = new Thread(r, "mRemoteExecutor " + mCount++);
+                    thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                        @Override
+                        public void uncaughtException(Thread t, Throwable e) {
+
+                        }
+                    });
+                    return thread;
                 }
             },
             new RejectedExecutionHandler() {
@@ -70,13 +68,13 @@ public class MessageServiceManager {
      * MessageServer 的binder代理对象
      */
     private IMessageService mMessageService = null;
-    private static volatile MessageServiceManager mInstance = null;
+    private static volatile MsgServiceManager mInstance = null;
 
-    public static MessageServiceManager getInstance() {
+    public static MsgServiceManager getInstance() {
         if (mInstance == null) {
-            synchronized (MessageServiceManager.class) {
+            synchronized (MsgServiceManager.class) {
                 if (mInstance == null) {
-                    mInstance = new MessageServiceManager();
+                    mInstance = new MsgServiceManager();
                 }
             }
         }
@@ -117,6 +115,7 @@ public class MessageServiceManager {
                     e.printStackTrace();
                     Log.e(TAG, "onServiceConnected 连接死亡代理出错：" + e.getMessage());
                 }
+                bindPushMessageFilter();
             }
         }
 
@@ -288,32 +287,52 @@ public class MessageServiceManager {
         }
     }
 
-    public void registerPushFilter(IPushMessageFilter filter) {
-        mPushExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                boolean bRun = true;
-                while (bRun) {
-                    synchronized (mLock) {
-                        if (mMessageService == null) {
-                            bindMessageService();
-                            continue;
-                        }else {
-                            bRun = false;
-                            try {
-                                mMessageService.registerPushMessageFilter(filter);
-                            } catch (RemoteException e) {
-                                e.printStackTrace();
-                            }
+    private PushMsgFilterStub mPushMessageFilter = new PushMsgFilterStub();
+
+    public void registerPushObserver(IPushObserver observer){
+        mPushMessageFilter.register(observer);
+    }
+
+    public void unRegisterPushObserver(IPushObserver observer){
+        mPushMessageFilter.unRegister(observer);
+    }
+
+    public void bindPushMessageFilter() {
+        if (mPushMessageFilter != null) {
+            mRemoteExecutor.execute(new PushMessageFilterRunnable(mPushMessageFilter));
+        }
+    }
+
+    private class PushMessageFilterRunnable implements Runnable {
+        private IPushMessageFilter filter;
+
+        public PushMessageFilterRunnable(IPushMessageFilter filter) {
+            this.filter = filter;
+        }
+
+        @Override
+        public void run() {
+            boolean bRun = true;
+            while (bRun) {
+                synchronized (mLock) {
+                    if (mMessageService == null) {
+                        bindMessageService();
+                        continue;
+                    } else {
+                        bRun = false;
+                        try {
+                            mMessageService.registerPushMessageFilter(filter);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
                         }
                     }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        });
+        }
     }
 }

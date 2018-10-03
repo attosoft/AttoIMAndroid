@@ -18,13 +18,15 @@ import java.util.List;
 import cn.id0755.im.R;
 import cn.id0755.im.biz.TextMsgReq;
 import cn.id0755.im.biz.TextMsgResp;
+import cn.id0755.im.chat.proto.Push;
 import cn.id0755.im.chat.proto.Topic;
 import cn.id0755.sdk.android.biz.IRequestListener;
 import cn.id0755.im.view.binder.MsgLeftViewBinder;
 import cn.id0755.im.view.binder.MsgRightViewBinder;
 import cn.id0755.im.view.entity.MsgEntity;
 import cn.id0755.im.view.entity.TopicEntity;
-import cn.id0755.sdk.android.manager.MessageServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceManager;
+import cn.id0755.sdk.android.service.push.IPushObserver;
 import cn.id0755.sdk.android.utils.Log;
 import me.drakeet.multitype.ClassLinker;
 import me.drakeet.multitype.ItemViewBinder;
@@ -40,6 +42,7 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView mMsgList;
     private MultiTypeAdapter mMsgListAdapter = new MultiTypeAdapter();
     private List<MsgEntity> mData = new ArrayList<>();
+    private TopicEntity mTopicEntity;
 
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override
@@ -71,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
                     TextMsgReq req = new TextMsgReq();
                     req.setContent(mEditInput.getText().toString())
                             .setFrom("10086")
-                            .setTo("10086")
+                            .setTo(mTopicEntity.getTopicId())
                             .setTopicType(Topic.TopicType.PERSON)
                             .setListener(new IRequestListener<TextMsgResp>() {
                                 @Override
@@ -79,7 +82,7 @@ public class ChatActivity extends AppCompatActivity {
                                     Log.d(TAG, "onSuccess " + textMsgResp.getErrorMsg());
                                 }
                             });
-                    MessageServiceManager.getInstance().send(req);
+                    MsgServiceManager.getInstance().send(req);
 
                     mEditInput.setText("");
                     break;
@@ -93,7 +96,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        TopicEntity topicEntity = (TopicEntity) getIntent().getSerializableExtra(KEY_TOPIC_ENTITY);
+        mTopicEntity = (TopicEntity) getIntent().getSerializableExtra(KEY_TOPIC_ENTITY);
 
         mEditInput = findViewById(R.id.input_text);
         mEditInput.addTextChangedListener(mTextWatcher);
@@ -114,7 +117,31 @@ public class ChatActivity extends AppCompatActivity {
                 });
         mMsgListAdapter.setItems(mData);
         mMsgListAdapter.notifyDataSetChanged();
+
+        MsgServiceManager.getInstance().registerPushObserver(mPushObserver);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MsgServiceManager.getInstance().unRegisterPushObserver(mPushObserver);
+    }
 
+    private IPushObserver mPushObserver = new IPushObserver() {
+        @Override
+        public void onReceive(Push.Message message) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (message.getTopicType() == Topic.TopicType.PERSON && "10086".equals(message.getTo())) {
+                        MsgEntity msgEntity = new MsgEntity();
+                        msgEntity.setLeft(true)
+                                .setContent(message.getContent());
+                        mData.add(msgEntity);
+                        mMsgListAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
+    };
 }

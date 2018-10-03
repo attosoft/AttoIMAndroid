@@ -26,16 +26,17 @@ public class DefaultTopicViewBinder extends ItemViewBinder<TopicEntity, TopicVH>
 
     @Override
     protected void onBindViewHolder(@NonNull TopicVH holder, @NonNull TopicEntity item) {
+        holder.getTopicName().setText(item.getTopicId());
         if (holder.getAdapterPosition() % 2 == 0) {
             holder.getContainer().setBackgroundColor(holder.getContainer().getResources().getColor(R.color.colorAccent));
-            holder.getContainer().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onClickListener != null) {
-                        onClickListener.onClick(holder.getAdapterPosition(), item);
-                    }
-                }
-            });
         }
+        holder.getContainer().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onClickListener != null) {
+                    onClickListener.onClick(holder.getAdapterPosition(), item);
+                }
+            }
+        });
     }
 }

@@ -6,6 +6,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.Map;
 
+import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.im.chat.proto.Push;
@@ -21,10 +22,11 @@ public class PushHandler extends BaseBizHandler<Push.Message> {
 
     }
 
-    private IPushMessageListener mPushMessageListener;
-
-    public PushHandler(IPushMessageListener listener) {
-        this.mPushMessageListener = listener;
+    private IPushMessageFilter mPushMessageListener;
+    public void setPushMessageFilter(IPushMessageFilter filter){
+        mPushMessageListener = filter;
+    }
+    public PushHandler() {
     }
 
     @Override
@@ -33,14 +35,18 @@ public class PushHandler extends BaseBizHandler<Push.Message> {
             return false;
         }
         final Push.Message message = getMessageLite().getParserForType().parseFrom(msg.getContent());
-        ConnectionManager.mWorkerExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
+//        ConnectionManager.mWorkerExecutor.submit(new Runnable() {
+//            @Override
+//            public void run() {
                 if (mPushMessageListener != null) {
-                    mPushMessageListener.pushMessage(message);
+                    try {
+                        mPushMessageListener.onReceive(Message.CMD_ID.PING_VALUE,message.toByteArray());
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+//            }
+//        });
 
         return true;
     }

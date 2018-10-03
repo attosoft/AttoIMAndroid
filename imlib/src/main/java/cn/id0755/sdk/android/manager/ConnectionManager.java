@@ -16,6 +16,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.sdk.android.config.Config;
@@ -235,7 +236,7 @@ public class ConnectionManager {
             e.printStackTrace();
         }
     }
-
+    private PushHandler pushHandler = new PushHandler();
     private void connect(int port, String host) throws Exception {
         // 配置客户端NIO线程组
         EventLoopGroup group = new NioEventLoopGroup();
@@ -250,7 +251,7 @@ public class ConnectionManager {
                             ProtocolClientHandler protocolClientHandler = new ProtocolClientHandler(mChannelListener);
                             protocolClientHandler.addBizHandler(new LoginHandler());
                             protocolClientHandler.addBizHandler(new PongHandler());
-                            protocolClientHandler.addBizHandler(new PushHandler(mPushMessageListener));
+                            protocolClientHandler.addBizHandler(pushHandler);
                             /** 添加读写超时，产生idle事件，实现心跳机制;可以更智能一点，不固定收到就发ping，10s -- 10分钟之间*/
                             ch.pipeline().addLast(new IdleStateHandler(30, 30, 30));
                             ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
@@ -283,9 +284,8 @@ public class ConnectionManager {
         }
     }
 
-    private IPushMessageListener mPushMessageListener = null;
-    public void setPushMessageListener(IPushMessageListener listener){
-        mPushMessageListener = listener;
+    public void setPushMessageListener(IPushMessageFilter filter){
+        pushHandler.setPushMessageFilter(filter);
     }
 
     /**
