@@ -35,12 +35,10 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
      */
     public ProtocolClientHandler(IChannelListener channelListener) {
         mChannelListener = channelListener;
-        init();
     }
 
-    private void init() {
-        mBizHandlerList.add(new LoginHandler());
-        mBizHandlerList.add(new PongHandler());
+    public void addBizHandler(BaseBizHandler baseBizHandler){
+        mBizHandlerList.add(baseBizHandler);
     }
 
     @Override
@@ -84,11 +82,11 @@ public class ProtocolClientHandler extends SimpleChannelInboundHandler<Message.M
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message.MessageData msg) throws Exception {
         Log.d(TAG, "channelRead0 | msg:" + msg.getCmdId());
-//        for (BaseBizHandler bizHandler : mBizHandlerList) {
-//            if (bizHandler.channelRead0(ctx, msg)) {
-//                break;
-//            }
-//        }
+        for (BaseBizHandler bizHandler : mBizHandlerList) {
+            if (bizHandler.channelRead0(ctx, msg)) {
+                return;
+            }
+        }
         Attribute<Map<String, ITaskWrapper>> attribute = ctx.channel().attr(AttributeKey.valueOf(ConnectionManager.KEY_TASK));
         Map<String, ITaskWrapper> taskWrapperMap = attribute.get();
         ITaskWrapper taskWrapper = null;

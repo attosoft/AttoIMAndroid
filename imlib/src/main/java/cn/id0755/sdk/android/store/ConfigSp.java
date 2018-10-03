@@ -3,7 +3,7 @@ package cn.id0755.sdk.android.store;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import cn.id0755.sdk.android.manager.ImApplication;
+import cn.id0755.sdk.android.config.ImApplication;
 
 public class ConfigSp {
 

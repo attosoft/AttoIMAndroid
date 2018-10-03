@@ -11,7 +11,7 @@ import java.util.List;
 
 import cn.id0755.im.R;
 import cn.id0755.im.chat.proto.Topic;
-import cn.id0755.im.task.ITaskListener;
+import cn.id0755.sdk.android.task.ITaskListener;
 import cn.id0755.im.task.SubjectTask;
 import cn.id0755.im.view.binder.DefaultTopicViewBinder;
 import cn.id0755.im.view.entity.TopicEntity;

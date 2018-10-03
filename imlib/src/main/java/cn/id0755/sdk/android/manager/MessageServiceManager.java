@@ -14,12 +14,15 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.id0755.im.IMessageService;
+import cn.id0755.im.IPushMessageFilter;
 import cn.id0755.im.ITaskWrapper;
+import cn.id0755.sdk.android.biz.BaseReq;
+import cn.id0755.sdk.android.config.ImApplication;
 import cn.id0755.sdk.android.config.TaskProperty;
 import cn.id0755.sdk.android.service.MsgRemoteService;
+import cn.id0755.sdk.android.task.CommonTask;
 import cn.id0755.sdk.android.utils.Log;
 
 public class MessageServiceManager {
@@ -28,6 +31,17 @@ public class MessageServiceManager {
     private MessageServiceManager() {
         init();
     }
+
+    private ThreadPoolExecutor mPushExecutor = new ThreadPoolExecutor(1, 3, 10,
+            TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+            new ThreadFactory() {
+                private int mCount = 0;
+
+                @Override
+                public Thread newThread(@NonNull Runnable r) {
+                    return new Thread(r, "mPushExecutor" + mCount++);
+                }
+            });
 
     private ThreadPoolExecutor mRemoteExecutor = new ThreadPoolExecutor(0, 1, 10,
             TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
@@ -185,10 +199,6 @@ public class MessageServiceManager {
         }
     }
 
-//    private void sendMessage(AbstractMessageLite messageLite) {
-//        Message.MessageData messageData = MessageUtil.wrap(messageLite);
-//    }
-
     /**
      * 只代表添加到任务队列是否成功
      *
@@ -197,6 +207,11 @@ public class MessageServiceManager {
      */
     public boolean send(ITaskWrapper taskWrapper) {
         return mTaskQueue.offer(taskWrapper);
+    }
+
+    public boolean send(BaseReq req) {
+        CommonTask commonTask = new CommonTask(req);
+        return mTaskQueue.offer(commonTask);
     }
 
     /**
@@ -271,5 +286,34 @@ public class MessageServiceManager {
                 }
             }
         }
+    }
+
+    public void registerPushFilter(IPushMessageFilter filter) {
+        mPushExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                boolean bRun = true;
+                while (bRun) {
+                    synchronized (mLock) {
+                        if (mMessageService == null) {
+                            bindMessageService();
+                            continue;
+                        }else {
+                            bRun = false;
+                            try {
+                                mMessageService.registerPushMessageFilter(filter);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 }

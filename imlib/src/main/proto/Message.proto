@@ -17,6 +17,8 @@ enum CMD_ID {
     PONG = 11;
     SUBJECT_TOPIC_REQ = 12;
     SUBJECT_TOPIC_RESP = 13;
+    COMMON_REQ = 14;
+    COMMON_RESP = 15;
 }
 
 message MessageData {

@@ -1,0 +1,21 @@
+syntax = "proto3";
+package cn.id0755.im.chat.proto;
+
+message CommonReq {
+    int32 type = 1;
+    string content = 2;
+}
+
+message CommonResp {
+//    int32 err_code = 1;
+//    string err_msg = 2;
+    int32 type = 3;
+    string content = 4;
+
+//    enum Error {
+//        ERR_OK = 0;
+//        ERR_FAIL = -1;
+//    }
+
+}
+

@@ -20,7 +20,11 @@ import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Message;
 import cn.id0755.sdk.android.config.Config;
 import cn.id0755.sdk.android.config.TaskProperty;
+import cn.id0755.sdk.android.handler.LoginHandler;
+import cn.id0755.sdk.android.handler.PongHandler;
+import cn.id0755.sdk.android.handler.PushHandler;
 import cn.id0755.sdk.android.manager.iinterface.IChannelListener;
+import cn.id0755.sdk.android.manager.iinterface.IPushMessageListener;
 import cn.id0755.sdk.android.manager.iinterface.IServerConnectionListener;
 import cn.id0755.sdk.android.handler.ProtocolClientHandler;
 import cn.id0755.sdk.android.utils.Log;
@@ -52,7 +56,7 @@ public class ConnectionManager {
 
     private ConnectionManager() {
         //todo
-        mSendMsgExecutor.submit(mSendMsgRunnable);
+        mSendMsgExecutor.execute(mSendMsgRunnable);
     }
 
     private static volatile ConnectionManager mInstance = null;
@@ -71,8 +75,8 @@ public class ConnectionManager {
     /**
      * 起一线程管理，因为会调用后会阻塞啊
      */
-    private ThreadPoolExecutor mConnectExecutor = new ThreadPoolExecutor(1, 1, 10,
-            TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1), new ThreadFactory() {
+    private ThreadPoolExecutor mConnectExecutor = new ThreadPoolExecutor(0, 2, 10,
+            TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(2), new ThreadFactory() {
         @Override
         public Thread newThread(@NonNull Runnable r) {
             return new Thread(r, "ConnectExecutor");
@@ -93,13 +97,13 @@ public class ConnectionManager {
         @Override
         public Thread newThread(@NonNull Runnable r) {
             Thread thread = new Thread(r, "mSendMsgExecutor");
-//            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-//                @Override
-//                public void uncaughtException(Thread t, Throwable e) {
-//                    Log.e(TAG,"mSendMsgExecutor | uncaughtException:" + e.getMessage());
-//                    mSendMsgExecutor.submit(mSendMsgRunnable);
-//                }
-//            });
+            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread t, Throwable e) {
+                    Log.e(TAG,"mSendMsgExecutor | uncaughtException:" + e.getMessage());
+                    mSendMsgExecutor.execute(mSendMsgRunnable);
+                }
+            });
             return thread;
         }
     }, new RejectedExecutionHandler() {
@@ -167,6 +171,8 @@ public class ConnectionManager {
                         } catch (RemoteException e) {
                             Log.e(TAG, "mSendMsgRunnable | " + e.getMessage());
                             e.printStackTrace();
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
                         }
                     }
                 }
@@ -241,13 +247,17 @@ public class ConnectionManager {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
+                            ProtocolClientHandler protocolClientHandler = new ProtocolClientHandler(mChannelListener);
+                            protocolClientHandler.addBizHandler(new LoginHandler());
+                            protocolClientHandler.addBizHandler(new PongHandler());
+                            protocolClientHandler.addBizHandler(new PushHandler(mPushMessageListener));
                             /** 添加读写超时，产生idle事件，实现心跳机制;可以更智能一点，不固定收到就发ping，10s -- 10分钟之间*/
-                            ch.pipeline().addLast(new IdleStateHandler(10, 10, 20));
+                            ch.pipeline().addLast(new IdleStateHandler(30, 30, 30));
                             ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
                             ch.pipeline().addLast(new ProtobufDecoder(Message.MessageData.getDefaultInstance()));
                             ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
                             ch.pipeline().addLast(new ProtobufEncoder());
-                            ch.pipeline().addLast(new ProtocolClientHandler(mChannelListener));
+                            ch.pipeline().addLast(protocolClientHandler);
                         }
                     });
 
@@ -271,6 +281,11 @@ public class ConnectionManager {
             group.shutdownGracefully();
             bConnecting = false;
         }
+    }
+
+    private IPushMessageListener mPushMessageListener = null;
+    public void setPushMessageListener(IPushMessageListener listener){
+        mPushMessageListener = listener;
     }
 
     /**

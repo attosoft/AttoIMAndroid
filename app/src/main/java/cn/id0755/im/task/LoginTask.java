@@ -10,6 +10,7 @@ import java.util.UUID;
 import cn.id0755.im.ITaskWrapper;
 import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.chat.proto.Message;
+import cn.id0755.sdk.android.task.ITaskListener;
 import cn.id0755.sdk.android.utils.MessageUtil;
 
 public class LoginTask extends ITaskWrapper.Stub implements ITaskWrapper {

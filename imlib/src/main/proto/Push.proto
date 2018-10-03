@@ -1,9 +1,8 @@
 syntax = "proto3";
 package cn.id0755.im.chat.proto;
-
-
+import "Topic.proto";
 message Message {
-     string topic = 1;
+     TopicType topicType = 1;
      string content = 2;
      string from = 3;
 }
