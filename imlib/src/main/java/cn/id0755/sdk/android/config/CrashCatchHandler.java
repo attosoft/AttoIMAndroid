@@ -41,11 +41,11 @@ public class CrashCatchHandler implements Thread.UncaughtExceptionHandler {
             //如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultCaughtExceptionHandler.uncaughtException(thread, throwable);
         }else {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                Log.e(TAG, "error : "+ e);
-            }
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                Log.e(TAG, "error : "+ e);
+//            }
             //退出程序
 //            AppUtil.restarteApp(mContext);
         }
@@ -63,16 +63,16 @@ public class CrashCatchHandler implements Thread.UncaughtExceptionHandler {
         if (msg == null) {
             return false;
         }
-
+        ex.printStackTrace();
         //使用Toast来显示异常信息
-        new Thread() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                Toast.makeText(mContext, "很抱歉,程序出现异常！", Toast.LENGTH_LONG).show();
-                Looper.loop();
-            }
-        }.start();
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                Looper.prepare();
+//                Toast.makeText(mContext, "很抱歉,程序出现异常！", Toast.LENGTH_LONG).show();
+//                Looper.loop();
+//            }
+//        }.start();
         return true;
     }
 }

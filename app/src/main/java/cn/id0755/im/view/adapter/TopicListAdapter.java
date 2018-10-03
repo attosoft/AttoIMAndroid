@@ -1,4 +1,4 @@
-package cn.id0755.im.adapter;
+package cn.id0755.im.view.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

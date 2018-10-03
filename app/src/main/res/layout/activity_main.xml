@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cn.id0755.im.activity.MainActivity">
+    tools:context="cn.id0755.im.view.activity.MainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_topic_list"

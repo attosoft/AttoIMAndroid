@@ -1,4 +1,4 @@
-package cn.id0755.im.activity;
+package cn.id0755.im.view.activity;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                                                     Intent intent = new Intent();
                                                     intent.setClass(LoginActivity.this,MainActivity.class);
                                                     startActivity(intent);
-                                                    finish();
+//                                                    finish();
                                                 }
                                             }
 

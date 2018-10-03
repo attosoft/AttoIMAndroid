@@ -1,4 +1,4 @@
-package cn.id0755.im.activity;
+package cn.id0755.im.view.activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

@@ -8,28 +8,31 @@ import android.os.Process;
 import java.util.List;
 
 import cn.id0755.sdk.android.manager.MsgServiceManager;
-import cn.id0755.sdk.android.service.push.PushMsgFilterStub;
 
 public class ImApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        CrashCatchHandler.getInstance().init(this);
         String processName = getProcessName(Process.myPid());
         if (getPackageName().equals(processName)) {
             // init
-            CrashCatchHandler.getInstance().init(this);
             MsgServiceManager.getInstance().bindPushMessageFilter();
         }
     }
 
     /**
      * 根据进程 ID 获取进程名
+     *
      * @param pid
      * @return
      */
-    public  String getProcessName(int pid){
-        ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+    public String getProcessName(int pid) {
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) {
+            return null;
+        }
         List<ActivityManager.RunningAppProcessInfo> processInfoList = am.getRunningAppProcesses();
         if (processInfoList == null) {
             return null;
@@ -55,7 +58,6 @@ public class ImApplication extends Application {
     private static ImApplication mInstance = null;
 
     public static Application getInstance() {
-        ImApplication mInstance = ImApplication.mInstance;
         return mInstance;
     }
 }
