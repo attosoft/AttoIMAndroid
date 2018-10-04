@@ -70,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+        mPublishListViewModel.subjectOnlineChange().observe(this, new Observer<TopicEntity>() {
+            @Override
+            public void onChanged(@Nullable TopicEntity topicEntity) {
+                mTopicListData.add(topicEntity);
+                mTopicListAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void initListeners() {

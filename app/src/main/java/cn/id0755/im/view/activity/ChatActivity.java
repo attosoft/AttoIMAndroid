@@ -20,6 +20,7 @@ import cn.id0755.im.biz.TextMsgReq;
 import cn.id0755.im.biz.TextMsgResp;
 import cn.id0755.im.chat.proto.Push;
 import cn.id0755.im.chat.proto.Topic;
+import cn.id0755.im.data.source.sp.AccountSp;
 import cn.id0755.sdk.android.biz.IRequestListener;
 import cn.id0755.im.view.binder.MsgLeftViewBinder;
 import cn.id0755.im.view.binder.MsgRightViewBinder;
@@ -73,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
                     mMsgListAdapter.notifyDataSetChanged();
                     TextMsgReq req = new TextMsgReq();
                     req.setContent(mEditInput.getText().toString())
-                            .setFrom("10086")
+                            .setFrom(AccountSp.getInstance().getAccount())
                             .setTo(mTopicEntity.getTopicId())
                             .setTopicType(Topic.TopicType.PERSON)
                             .setListener(new IRequestListener<TextMsgResp>() {
@@ -133,7 +134,7 @@ public class ChatActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (message.getTopicType() == Topic.TopicType.PERSON && "10086".equals(message.getTo())) {
+                    if (message.getTopicType() == Topic.TopicType.PERSON && AccountSp.getInstance().getAccount().equals(message.getTo())) {
                         MsgEntity msgEntity = new MsgEntity();
                         msgEntity.setLeft(true)
                                 .setContent(message.getContent());

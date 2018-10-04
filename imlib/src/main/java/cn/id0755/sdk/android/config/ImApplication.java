@@ -14,7 +14,7 @@ public class ImApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        CrashCatchHandler.getInstance().init(this);
+        CrashHandler.getInstance().init(this);
         String processName = getProcessName(Process.myPid());
         if (getPackageName().equals(processName)) {
             // init

@@ -27,7 +27,10 @@ public class PublishListViewModel extends ViewModel {
      * @return
      */
     public MutableLiveData<List<TopicEntity>> getPushList() {
-        return mPublishListLiveData;
+        if (mPublishListLiveData == null) {
+            mPublishListLiveData = mPublishRepository.getPushList();
+        }
+        return mPublishRepository.getPushList();
     }
 
     /**
@@ -39,9 +42,11 @@ public class PublishListViewModel extends ViewModel {
         return mPublishRepository.subject(mPublishListLiveData.getValue());
     }
 
+    public MutableLiveData<TopicEntity> subjectOnlineChange(){
+        return mPublishRepository.subjectOnlineChange();
+    }
+
     public void init() {
-        if (mPublishListLiveData == null) {
-            mPublishListLiveData = mPublishRepository.getPushList();
-        }
+
     }
 }

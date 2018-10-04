@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 
 import cn.id0755.im.chat.proto.Login;
+import cn.id0755.im.data.source.sp.AccountSp;
 import cn.id0755.sdk.android.task.ITaskListener;
 import cn.id0755.im.task.LoginTask;
 import cn.id0755.sdk.android.manager.MsgServiceManager;
@@ -53,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         // Set up the login form.
         initView();
 
-        mPhoneView.setText("13510773000");
+        mPhoneView.setText(AccountSp.getInstance().getAccount());
         mPasswordView.setText("123456");
     }
 
@@ -81,14 +82,15 @@ public class LoginActivity extends AppCompatActivity {
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     @Override
                     public void run() {
+                        AccountSp.getInstance().setAccount(mPhoneView.getText().toString());
                         MsgServiceManager.getInstance().send(
-                                new LoginTask("10086", "123456")
+                                new LoginTask(mPhoneView.getText().toString(), "123456")
                                         .setListener(new ITaskListener<Login.LoginResponse>() {
                                             @Override
                                             public void onResp(Login.LoginResponse resp) {
-                                                if (resp.getAccessToken() != null){
+                                                if (resp.getAccessToken() != null) {
                                                     Intent intent = new Intent();
-                                                    intent.setClass(LoginActivity.this,MainActivity.class);
+                                                    intent.setClass(LoginActivity.this, MainActivity.class);
                                                     startActivity(intent);
 //                                                    finish();
                                                 }
