@@ -11,7 +11,7 @@ import cn.id0755.im.biz.SubjectResp;
 import cn.id0755.im.chat.proto.Push;
 import cn.id0755.im.view.entity.TopicEntity;
 import cn.id0755.sdk.android.biz.IRequestListener;
-import cn.id0755.sdk.android.manager.MsgServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceImpl;
 import cn.id0755.sdk.android.service.push.IPushObserver;
 import cn.id0755.sdk.android.utils.Log;
 
@@ -22,7 +22,7 @@ public class PublishRepository {
     private final static String TAG = PublishRepository.class.getSimpleName();
 
     public PublishRepository() {
-        MsgServiceManager.getInstance().registerPushObserver(new IPushObserver() {
+        MsgServiceImpl.getInstance().registerPushObserver(new IPushObserver() {
             @Override
             public void onReceive(Push.Message message) {
                 if (message.getTopicType() == BROADCAST) {
@@ -44,7 +44,7 @@ public class PublishRepository {
                 mPublishList.postValue(getPublishResp.getTopicEntities());
             }
         });
-        MsgServiceManager.getInstance().send(req);
+        MsgServiceImpl.getInstance().send(req);
         return mPublishList;
     }
 
@@ -59,7 +59,7 @@ public class PublishRepository {
                         liveData.postValue(subjectResp != null);
                     }
                 });
-        MsgServiceManager.getInstance().send(subjectReq);
+        MsgServiceImpl.getInstance().send(subjectReq);
         return liveData;
     }
 

@@ -21,12 +21,14 @@ import cn.id0755.im.biz.TextMsgResp;
 import cn.id0755.im.chat.proto.Push;
 import cn.id0755.im.chat.proto.Topic;
 import cn.id0755.im.data.source.sp.AccountSp;
+import cn.id0755.im.manager.ServerManager;
 import cn.id0755.sdk.android.biz.IRequestListener;
 import cn.id0755.im.view.binder.MsgLeftViewBinder;
 import cn.id0755.im.view.binder.MsgRightViewBinder;
 import cn.id0755.im.view.entity.MsgEntity;
 import cn.id0755.im.view.entity.TopicEntity;
-import cn.id0755.sdk.android.manager.MsgServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceImpl;
+import cn.id0755.sdk.android.manager.iinterface.IMsgService;
 import cn.id0755.sdk.android.service.push.IPushObserver;
 import cn.id0755.sdk.android.utils.Log;
 import me.drakeet.multitype.ClassLinker;
@@ -83,7 +85,7 @@ public class ChatActivity extends AppCompatActivity {
                                     Log.d(TAG, "onSuccess " + textMsgResp.getErrorMsg());
                                 }
                             });
-                    MsgServiceManager.getInstance().send(req);
+                    MsgServiceImpl.getInstance().send(req);
 
                     mEditInput.setText("");
                     break;
@@ -119,13 +121,14 @@ public class ChatActivity extends AppCompatActivity {
         mMsgListAdapter.setItems(mData);
         mMsgListAdapter.notifyDataSetChanged();
 
-        MsgServiceManager.getInstance().registerPushObserver(mPushObserver);
+        MsgServiceImpl.getInstance().registerPushObserver(mPushObserver);
+        IMsgService serviceManager = ServerManager.getInstance().getService("MSG");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MsgServiceManager.getInstance().unRegisterPushObserver(mPushObserver);
+        MsgServiceImpl.getInstance().unRegisterPushObserver(mPushObserver);
     }
 
     private IPushObserver mPushObserver = new IPushObserver() {

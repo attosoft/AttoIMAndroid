@@ -5,9 +5,11 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Process;
 
+import com.facebook.stetho.Stetho;
+
 import java.util.List;
 
-import cn.id0755.sdk.android.manager.MsgServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceImpl;
 
 public class ImApplication extends Application {
     @Override
@@ -18,8 +20,12 @@ public class ImApplication extends Application {
         String processName = getProcessName(Process.myPid());
         if (getPackageName().equals(processName)) {
             // init
-            MsgServiceManager.getInstance().bindPushMessageFilter();
+            MsgServiceImpl.getInstance().bindPushMessageFilter();
         }
+        Stetho.initializeWithDefaults(this);
+//        new OkHttpClient.Builder()
+//                .addNetworkInterceptor(new StethoInterceptor())
+//                .build();
     }
 
     /**

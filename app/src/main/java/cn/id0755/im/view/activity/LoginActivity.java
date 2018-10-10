@@ -20,7 +20,7 @@ import cn.id0755.im.chat.proto.Login;
 import cn.id0755.im.data.source.sp.AccountSp;
 import cn.id0755.sdk.android.task.ITaskListener;
 import cn.id0755.im.task.LoginTask;
-import cn.id0755.sdk.android.manager.MsgServiceManager;
+import cn.id0755.sdk.android.manager.MsgServiceImpl;
 
 import java.util.concurrent.Executors;
 
@@ -83,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         AccountSp.getInstance().setAccount(mPhoneView.getText().toString());
-                        MsgServiceManager.getInstance().send(
+                        MsgServiceImpl.getInstance().send(
                                 new LoginTask(mPhoneView.getText().toString(), "123456")
                                         .setListener(new ITaskListener<Login.LoginResponse>() {
                                             @Override

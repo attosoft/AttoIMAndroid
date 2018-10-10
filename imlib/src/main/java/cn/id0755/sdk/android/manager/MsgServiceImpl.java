@@ -21,16 +21,20 @@ import cn.id0755.im.ITaskWrapper;
 import cn.id0755.sdk.android.biz.BaseReq;
 import cn.id0755.sdk.android.config.ImApplication;
 import cn.id0755.sdk.android.config.TaskProperty;
+import cn.id0755.sdk.android.manager.iinterface.IMsgService;
 import cn.id0755.sdk.android.service.MsgRemoteService;
 import cn.id0755.sdk.android.service.push.IPushObserver;
 import cn.id0755.sdk.android.service.push.PushMsgFilterStub;
 import cn.id0755.sdk.android.task.CommonTask;
 import cn.id0755.sdk.android.utils.Log;
 
-public class MsgServiceManager {
-    private final static String TAG = MsgServiceManager.class.getSimpleName();
+/**
+ * @author Tikey
+ */
+public class MsgServiceImpl implements IMsgService{
+    private final static String TAG = MsgServiceImpl.class.getSimpleName();
 
-    private MsgServiceManager() {
+    private MsgServiceImpl() {
         init();
     }
 
@@ -68,13 +72,13 @@ public class MsgServiceManager {
      * MessageServer 的binder代理对象
      */
     private IMessageService mMessageService = null;
-    private static volatile MsgServiceManager mInstance = null;
+    private static volatile MsgServiceImpl mInstance = null;
 
-    public static MsgServiceManager getInstance() {
+    public static MsgServiceImpl getInstance() {
         if (mInstance == null) {
-            synchronized (MsgServiceManager.class) {
+            synchronized (MsgServiceImpl.class) {
                 if (mInstance == null) {
-                    mInstance = new MsgServiceManager();
+                    mInstance = new MsgServiceImpl();
                 }
             }
         }
@@ -204,10 +208,12 @@ public class MsgServiceManager {
      * @param taskWrapper
      * @return
      */
+    @Override
     public boolean send(ITaskWrapper taskWrapper) {
         return mTaskQueue.offer(taskWrapper);
     }
 
+    @Override
     public boolean send(BaseReq req) {
         CommonTask commonTask = new CommonTask(req);
         return mTaskQueue.offer(commonTask);
@@ -218,6 +224,7 @@ public class MsgServiceManager {
      *
      * @param taskWrapper
      */
+    @Override
     public void cancel(final ITaskWrapper taskWrapper) {
         mRemoteExecutor.submit(new Runnable() {
             @Override
@@ -289,14 +296,17 @@ public class MsgServiceManager {
 
     private PushMsgFilterStub mPushMessageFilter = new PushMsgFilterStub();
 
+    @Override
     public void registerPushObserver(IPushObserver observer){
         mPushMessageFilter.register(observer);
     }
 
+    @Override
     public void unRegisterPushObserver(IPushObserver observer){
         mPushMessageFilter.unRegister(observer);
     }
 
+    @Override
     public void bindPushMessageFilter() {
         if (mPushMessageFilter != null) {
             mRemoteExecutor.execute(new PushMessageFilterRunnable(mPushMessageFilter));
